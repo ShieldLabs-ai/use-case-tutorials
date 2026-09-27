@@ -1,0 +1,22 @@
+[
+  { "id": 1, "name": "Oak desk lamp", "category": "Lighting", "price": 64, "keywords": ["lamp", "light", "desk", "wood"] },
+  { "id": 2, "name": "Linen floor lamp", "category": "Lighting", "price": 129, "keywords": ["lamp", "light", "floor"] },
+  { "id": 3, "name": "Brass wall sconce", "category": "Lighting", "price": 89, "keywords": ["light", "wall", "sconce"] },
+  { "id": 4, "name": "Wool throw blanket", "category": "Textiles", "price": 72, "keywords": ["blanket", "throw", "wool"] },
+  { "id": 5, "name": "Cotton waffle towel set", "category": "Textiles", "price": 38, "keywords": ["towel", "bath", "cotton"] },
+  { "id": 6, "name": "Striped cushion cover", "category": "Textiles", "price": 24, "keywords": ["cushion", "pillow", "cover"] },
+  { "id": 7, "name": "Stoneware mugs, set of 4", "category": "Kitchen", "price": 42, "keywords": ["mug", "cup", "coffee", "tea"] },
+  { "id": 8, "name": "Cast iron skillet", "category": "Kitchen", "price": 55, "keywords": ["pan", "skillet", "cooking"] },
+  { "id": 9, "name": "Glass pour-over coffee maker", "category": "Kitchen", "price": 36, "keywords": ["coffee", "glass"] },
+  { "id": 10, "name": "Bamboo cutting board", "category": "Kitchen", "price": 29, "keywords": ["board", "cutting", "bamboo"] },
+  { "id": 11, "name": "Ceramic plant pot", "category": "Garden", "price": 26, "keywords": ["plant", "pot", "ceramic"] },
+  { "id": 12, "name": "Macrame hanging planter", "category": "Garden", "price": 31, "keywords": ["plant", "planter", "hanging"] },
+  { "id": 13, "name": "Galvanized watering can", "category": "Garden", "price": 22, "keywords": ["watering", "can", "plant"] },
+  { "id": 14, "name": "Walnut bookshelf", "category": "Furniture", "price": 249, "keywords": ["shelf", "books", "wood"] },
+  { "id": 15, "name": "Folding side table", "category": "Furniture", "price": 85, "keywords": ["table", "side"] },
+  { "id": 16, "name": "Upholstered bench", "category": "Furniture", "price": 179, "keywords": ["bench", "seat"] },
+  { "id": 17, "name": "Minimal wall clock", "category": "Decor", "price": 48, "keywords": ["clock", "wall"] },
+  { "id": 18, "name": "Round wall mirror", "category": "Decor", "price": 95, "keywords": ["mirror", "wall", "round"] },
+  { "id": 19, "name": "Cedar scented candle", "category": "Decor", "price": 19, "keywords": ["candle", "scent"] },
+  { "id": 20, "name": "Picture frame set", "category": "Decor", "price": 33, "keywords": ["frame", "photo", "picture"] }
+]

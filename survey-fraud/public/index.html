@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Survey fraud demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <main class="mx-auto max-w-lg px-4 py-12">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Research</p>
+      <h1 class="mt-1 text-2xl font-semibold">Kitchen habits survey</h1>
+      <p class="mt-2 text-sm text-slate-600">Three questions, about two minutes. Get a $5 gift card for your answers.</p>
+
+      <form id="surveyForm" class="mt-6 space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <fieldset>
+          <legend class="text-sm font-medium">1. How often do you cook at home?</legend>
+          <div class="mt-2 space-y-1 text-sm">
+            <label class="flex items-center gap-2"><input type="radio" name="cooking" value="daily" required /> Every day</label>
+            <label class="flex items-center gap-2"><input type="radio" name="cooking" value="weekly" /> A few times a week</label>
+            <label class="flex items-center gap-2"><input type="radio" name="cooking" value="rarely" /> Rarely</label>
+          </div>
+        </fieldset>
+
+        <label class="block">
+          <span class="text-sm font-medium">2. Which kitchen appliance would you buy next?</span>
+          <select id="nextAppliance" name="nextAppliance" required class="mt-2 w-full rounded-md border border-slate-300 px-3 py-2 text-sm">
+            <option value="">Choose one</option>
+            <option value="air-fryer">Air fryer</option>
+            <option value="blender">Blender</option>
+            <option value="coffee-machine">Coffee machine</option>
+            <option value="none">None of these</option>
+          </select>
+        </label>
+
+        <fieldset>
+          <legend class="text-sm font-medium">3. How much do you spend on groceries a week?</legend>
+          <div class="mt-2 space-y-1 text-sm">
+            <label class="flex items-center gap-2"><input type="radio" name="groceries" value="under-50" required /> Under $50</label>
+            <label class="flex items-center gap-2"><input type="radio" name="groceries" value="50-150" /> $50 to $150</label>
+            <label class="flex items-center gap-2"><input type="radio" name="groceries" value="over-150" /> Over $150</label>
+          </div>
+        </fieldset>
+
+        <label class="block">
+          <span class="text-sm font-medium">Email for your gift card</span>
+          <input id="email" name="email" type="email" autocomplete="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+        </label>
+
+        <button
+          id="submitBtn"
+          type="submit"
+          class="w-full rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+        >
+          Submit and get $5
+        </button>
+      </form>
+
+      <div id="result" class="hidden" role="status"></div>
+
+      <footer class="mt-10 text-center text-xs text-slate-500">
+        <a id="resetDb" href="#" class="underline">Reset demo DB</a>
+      </footer>
+    </main>
+
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>

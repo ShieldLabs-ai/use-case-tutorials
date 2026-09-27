@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Regional pricing demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <main class="mx-auto max-w-md px-4 py-12">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Design Studio</p>
+      <h1 class="mt-1 text-2xl font-semibold">Checkout</h1>
+
+      <div class="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="font-medium">Pro plan, 1 year</p>
+            <p class="text-sm text-slate-500">Unlimited projects and exports</p>
+          </div>
+          <p id="listPrice" class="font-medium"></p>
+        </div>
+
+        <form id="regionForm" class="mt-6 space-y-3 border-t border-slate-100 pt-4">
+          <label class="block">
+            <span class="text-sm font-medium">Country you are buying from</span>
+            <select id="country" name="country" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"></select>
+          </label>
+          <button
+            id="activateBtn"
+            type="submit"
+            class="w-full rounded-md border border-slate-900 px-4 py-2 font-medium hover:bg-slate-100 disabled:opacity-60"
+          >
+            Activate regional pricing
+          </button>
+          <p class="text-xs text-slate-500">Discount tiers in this demo are illustrative.</p>
+        </form>
+
+        <div class="mt-6 space-y-1 border-t border-slate-100 pt-4 text-sm">
+          <p class="flex justify-between"><span>List price</span><span id="subtotal"></span></p>
+          <div id="discountRow" class="hidden">
+            <p class="flex justify-between text-emerald-700"><span>Regional discount</span><span id="discount"></span></p>
+          </div>
+          <p class="flex justify-between text-base font-semibold"><span>Total</span><span id="total"></span></p>
+        </div>
+      </div>
+
+      <div id="result" class="hidden" role="status"></div>
+
+      <footer class="mt-10 text-center text-xs text-slate-500">
+        <a id="resetDb" href="#" class="underline">Reset demo DB</a>
+      </footer>
+    </main>
+
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>

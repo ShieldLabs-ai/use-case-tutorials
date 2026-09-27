@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Paywall demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <main class="mx-auto max-w-2xl px-4 py-12">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">The Millbrook Ledger</p>
+      <h1 class="mt-1 text-2xl font-semibold">Local news</h1>
+      <p class="mt-2 text-sm text-slate-600">Read 2 articles free every day. Subscribe for unlimited reading.</p>
+
+      <ul id="articles" class="mt-6 space-y-3"></ul>
+
+      <div id="result" class="hidden" role="status"></div>
+
+      <footer class="mt-10 text-center text-xs text-slate-500">
+        <a id="resetDb" href="#" class="underline">Reset demo DB</a>
+      </footer>
+    </main>
+
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>

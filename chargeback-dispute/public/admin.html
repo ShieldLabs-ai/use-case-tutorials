@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chargeback dispute demo: admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <main class="mx-auto max-w-5xl px-4 py-12">
+      <div class="flex items-baseline justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Tickets admin</p>
+        <a href="/" class="text-sm underline">Back to the shop</a>
+      </div>
+      <h1 class="mt-1 text-2xl font-semibold">Orders and chargebacks</h1>
+      <p class="mt-2 text-sm text-slate-600">
+        Simulate a chargeback on an order, then open its dispute evidence.
+      </p>
+
+      <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+            <tr>
+              <th class="px-4 py-2">Order</th>
+              <th class="px-4 py-2">Event</th>
+              <th class="px-4 py-2">Total</th>
+              <th class="px-4 py-2">Email</th>
+              <th class="px-4 py-2">Placed</th>
+              <th class="px-4 py-2">Status</th>
+              <th class="px-4 py-2"></th>
+            </tr>
+          </thead>
+          <tbody id="orders" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+
+      <div id="result" class="hidden" role="status"></div>
+
+      <section id="evidence" class="mt-8 hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm"></section>
+
+      <footer class="mt-10 text-center text-xs text-slate-500">
+        <a id="resetDb" href="#" class="underline">Reset demo DB</a>
+      </footer>
+    </main>
+
+    <script type="module" src="/admin.js"></script>
+  </body>
+</html>

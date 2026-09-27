@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Web scraping demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <main class="mx-auto max-w-3xl px-4 py-12">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Flights</p>
+      <h1 class="mt-1 text-2xl font-semibold">Find a flight</h1>
+
+      <form id="searchForm" class="mt-6 grid gap-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-4">
+        <label class="block">
+          <span class="text-sm font-medium">From</span>
+          <select id="from" name="from" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"></select>
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">To</span>
+          <select id="to" name="to" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"></select>
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">Date</span>
+          <input id="date" name="date" type="date" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+        </label>
+        <div class="flex items-end">
+          <button
+            id="searchBtn"
+            type="submit"
+            class="w-full rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+          >
+            Search
+          </button>
+        </div>
+      </form>
+
+      <div id="result" class="hidden" role="status"></div>
+
+      <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+            <tr>
+              <th class="px-4 py-2">Airline</th>
+              <th class="px-4 py-2">Flight</th>
+              <th class="px-4 py-2">Departs</th>
+              <th class="px-4 py-2">Arrives</th>
+              <th class="px-4 py-2">Duration</th>
+              <th class="px-4 py-2 text-right">Price</th>
+            </tr>
+          </thead>
+          <tbody id="flights" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+
+      <footer class="mt-10 text-center text-xs text-slate-500">
+        <a id="resetDb" href="#" class="underline">Reset demo DB</a>
+      </footer>
+    </main>
+
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>

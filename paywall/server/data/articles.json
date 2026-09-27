@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "Millbrook opens its first tool library",
+    "summary": "Drills, ladders and a pressure washer, borrowed like books with a library card.",
+    "author": "Priya Nair",
+    "date": "Sep 21, 2026",
+    "body": [
+      "The old post office on Canal Street reopened this week as the Millbrook Tool Library, and by Saturday afternoon more than half of its 400 tools were out on loan.",
+      "Members borrow for up to a week with the same card they use at the town library. The most requested items so far are the tile cutter, the carpet cleaner and, to the surprise of the volunteers, a single apple press.",
+      "The project started with donations from a hardware store that closed last spring. Volunteers now run repair evenings on Thursdays, where anyone can bring a broken tool and learn to fix it."
+    ]
+  },
+  {
+    "id": 2,
+    "title": "The night market moves to the old rail yard",
+    "summary": "More space, more stalls and, for the first time, a covered area for rainy Fridays.",
+    "author": "Tom Okafor",
+    "date": "Sep 19, 2026",
+    "body": [
+      "After six summers in the parking lot behind the town hall, the Friday night market is moving to the rail yard east of the river, which the town bought from the railway two years ago.",
+      "The new site fits 80 stalls instead of 45, and the old loading shed gives the market its first roof. Organizers say the waiting list for stalls, mostly food vendors, finally gets a chance to shrink.",
+      "Neighbors have asked about parking and noise. The town plans a shuttle from the train station and a 10 p.m. close, one hour earlier than before."
+    ]
+  },
+  {
+    "id": 3,
+    "title": "A beginner's guide to the river trail",
+    "summary": "Where to start, where to stop for coffee, and the one bridge to skip after heavy rain.",
+    "author": "Lena Fischer",
+    "date": "Sep 17, 2026",
+    "body": [
+      "The river trail runs 11 kilometers from the marina to the reservoir dam. Most of it is flat, and the first 4 kilometers are paved, which makes that stretch a good first outing on a bike or with a stroller.",
+      "Start at the marina lot, which has the most parking and the only public restrooms on the route. The kiosk at the halfway bench sells coffee on weekends from April to October.",
+      "After heavy rain, skip the wooden footbridge near the mill: the path beneath it floods. The road bridge a few hundred meters upstream is the safer way across."
+    ]
+  },
+  {
+    "id": 4,
+    "title": "The public pool now warms its water with the bakery's ovens",
+    "summary": "A heat exchanger between two neighbors cut the pool's heating bill by a third.",
+    "author": "Diego Ruiz",
+    "date": "Sep 14, 2026",
+    "body": [
+      "The Westside pool and the industrial bakery next to it have shared a wall for decades. Since June they also share heat: warm air from the bakery's ovens now passes through an exchanger that preheats the pool water.",
+      "The pool's operator says gas use for heating fell by about a third over the summer. The bakery, which used to vent that heat into the street, pays nothing and gets a slightly cooler loading dock.",
+      "The town is now studying whether the same idea could work for the library, which sits next to a data room at the county offices."
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Inside the volunteer team that restores old maps",
+    "summary": "Twelve volunteers, one flat file cabinet and a century of hand-drawn streets.",
+    "author": "Hana Sato",
+    "date": "Sep 10, 2026",
+    "body": [
+      "Every Tuesday a dozen volunteers meet in the basement of the historical society to flatten, clean and scan maps that have spent decades rolled up in attics.",
+      "The oldest map in the collection, a survey of the mill district, shows streets that were never built and a canal that was filled in before anyone alive today was born.",
+      "The scans go online as they are finished. The team is looking for help with one task above all: reading the handwriting in the margins."
+    ]
+  }
+]

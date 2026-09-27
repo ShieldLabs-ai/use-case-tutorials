@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Card testing demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <main class="mx-auto max-w-md px-4 py-12">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Gift Cards</p>
+      <h1 class="mt-1 text-2xl font-semibold">Send a digital gift card</h1>
+
+      <div class="mt-6 flex items-center gap-4 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 p-5 text-white shadow-sm">
+        <svg viewBox="0 0 24 24" class="h-10 w-10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <rect x="3" y="8" width="18" height="12" rx="2" />
+          <path d="M3 12h18M12 8v12M12 8c-1.5-3-5-3-5-1s3 1 5 1c2 0 5 1 5-1s-3.5-2-5 1" />
+        </svg>
+        <div>
+          <p class="font-semibold">Demo Gift Card</p>
+          <p class="text-sm text-emerald-100">Delivered by email, instantly.</p>
+        </div>
+      </div>
+
+      <form id="checkoutForm" class="mt-6 space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <fieldset>
+          <legend class="text-sm font-medium">Amount</legend>
+          <div class="mt-1 grid grid-cols-3 gap-2 text-sm">
+            <label class="flex items-center justify-center gap-2 rounded-md border border-slate-300 py-2">
+              <input type="radio" name="amount" value="25" checked /> $25
+            </label>
+            <label class="flex items-center justify-center gap-2 rounded-md border border-slate-300 py-2">
+              <input type="radio" name="amount" value="50" /> $50
+            </label>
+            <label class="flex items-center justify-center gap-2 rounded-md border border-slate-300 py-2">
+              <input type="radio" name="amount" value="100" /> $100
+            </label>
+          </div>
+        </fieldset>
+        <label class="block">
+          <span class="text-sm font-medium">Recipient email</span>
+          <input id="recipientEmail" name="recipientEmail" type="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">Card number</span>
+          <input
+            id="cardNumber"
+            name="cardNumber"
+            inputmode="numeric"
+            autocomplete="cc-number"
+            placeholder="4242 4242 4242 4242"
+            required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
+          />
+        </label>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="block">
+            <span class="text-sm font-medium">Expiry</span>
+            <input id="expiry" name="expiry" placeholder="MM/YY" autocomplete="cc-exp" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+          </label>
+          <label class="block">
+            <span class="text-sm font-medium">Security code</span>
+            <input id="cvc" name="cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+          </label>
+        </div>
+        <button
+          id="buyBtn"
+          type="submit"
+          class="w-full rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+        >
+          Buy gift card
+        </button>
+        <p class="text-xs text-slate-500">
+          Demo payments: <code>4242 4242 4242 4242</code> is approved, any other valid card number is declined. Nothing is charged.
+        </p>
+      </form>
+
+      <div id="result" class="hidden" role="status"></div>
+
+      <section class="mt-8">
+        <h2 class="text-sm font-semibold">Recent payment attempts</h2>
+        <ul id="attempts" class="mt-2 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white text-sm"></ul>
+      </section>
+
+      <footer class="mt-10 text-center text-xs text-slate-500">
+        <a id="resetDb" href="#" class="underline">Reset demo DB</a>
+      </footer>
+    </main>
+
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>

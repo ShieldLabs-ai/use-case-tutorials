@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chargeback dispute demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 text-slate-900">
+    <main class="mx-auto max-w-xl px-4 py-12">
+      <div class="flex items-baseline justify-between">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Tickets</p>
+        <a href="/admin.html" class="text-sm underline">Admin: orders and chargebacks</a>
+      </div>
+      <h1 class="mt-1 text-2xl font-semibold">Get tickets</h1>
+
+      <form id="orderForm" class="mt-6 space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <fieldset>
+          <legend class="text-sm font-medium">Event</legend>
+          <div id="events" class="mt-2 space-y-2"></div>
+        </fieldset>
+        <label class="block">
+          <span class="text-sm font-medium">Tickets</span>
+          <select id="quantity" name="quantity" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2">
+            <option>1</option>
+            <option selected>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+          </select>
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">Email for the tickets</span>
+          <input id="email" name="email" type="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+        </label>
+        <label class="block">
+          <span class="text-sm font-medium">Card number</span>
+          <input
+            id="cardNumber"
+            name="cardNumber"
+            inputmode="numeric"
+            autocomplete="cc-number"
+            placeholder="4242 4242 4242 4242"
+            required
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
+          />
+        </label>
+        <button
+          id="buyBtn"
+          type="submit"
+          class="w-full rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-700 disabled:opacity-60"
+        >
+          Buy tickets
+        </button>
+        <p class="text-xs text-slate-500">Demo payments: any card number is approved and nothing is charged.</p>
+      </form>
+
+      <div id="result" class="hidden" role="status"></div>
+
+      <footer class="mt-10 text-center text-xs text-slate-500">
+        <a id="resetDb" href="#" class="underline">Reset demo DB</a>
+      </footer>
+    </main>
+
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>

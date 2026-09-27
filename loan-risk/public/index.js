@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const form = document.getElementById('loanForm');
 const button = document.getElementById('applyBtn');
 const result = document.getElementById('result');
+
+// Identify the application when the user starts filling in the form.
+const identification = identifyOnFirstFocus(form);
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -14,6 +19,8 @@ form.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
+    // The request ID of this application's identification. The server reads the result.
+    application.requestId = await identification.take();
     const data = await postJson('/api/applications', application);
     showResult(data.success ? 'success' : 'error', data.message);
   } catch (error) {

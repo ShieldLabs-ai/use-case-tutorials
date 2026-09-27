@@ -12,14 +12,20 @@ const app = Fastify();
 app.register(fastifyCookie);
 app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
+// Expose only the Public Key to the browser. The Private API Key stays on the server.
+app.get('/config.js', async (_request, reply) => {
+  reply.type('application/javascript');
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+});
+
 // Sign in and store the session token in a cookie.
 app.post('/api/login', async (request, reply) => {
-  const { email, password } = request.body ?? {};
-  const result = await signIn({ email, password });
+  const { email, password, requestId, signOutOtherDevice } = request.body ?? {};
+  const result = await signIn({ email, password, requestId, signOutOtherDevice: signOutOtherDevice === true });
   if (result.success) {
     reply.setCookie('session', result.token, { httpOnly: true, sameSite: 'lax', path: '/' });
   }
-  return reply.send({ success: result.success, email: result.email, message: result.message });
+  return reply.send({ success: result.success, otherDevice: result.otherDevice, message: result.message });
 });
 
 // The state of this browser's session.

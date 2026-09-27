@@ -1,37 +1,38 @@
 import 'dotenv/config';
-import express from 'express';
+import Fastify from 'fastify';
+import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
 import { initDb, resetDb } from './db.js';
 import { sendCode, verifyCode } from './sms.js';
 
 initDb();
 
-const app = express();
-app.use(express.json());
-app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
+const app = Fastify();
+app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
 // Send a verification code to a phone number.
-app.post('/api/send-code', async (req, res) => {
-  const { phone } = req.body ?? {};
-  res.json(await sendCode({ phone }));
+app.post('/api/send-code', async (request, reply) => {
+  const { phone } = request.body ?? {};
+  return reply.send(await sendCode({ phone }));
 });
 
-app.post('/api/verify-code', async (req, res) => {
-  const { phone, code } = req.body ?? {};
-  res.json(await verifyCode({ phone, code }));
+app.post('/api/verify-code', async (request, reply) => {
+  const { phone, code } = request.body ?? {};
+  return reply.send(await verifyCode({ phone, code }));
 });
 
 // Reset the demo database.
-app.post('/api/reset-db', (_req, res) => {
+app.post('/api/reset-db', async (_request, reply) => {
   resetDb();
-  res.json({ success: true, message: 'Demo database reset.' });
+  return reply.send({ success: true, message: 'Demo database reset.' });
 });
 
 // Show server errors in the response, to make the tutorial easy to debug.
-app.use((err, _req, res, _next) => {
-  console.error(err);
-  res.status(500).json({ success: false, message: `Server error: ${err.message}` });
+app.setErrorHandler((error, _request, reply) => {
+  console.error(error);
+  reply.status(500).send({ success: false, message: `Server error: ${error.message}` });
 });
 
 const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+await app.listen({ port });
+console.log(`Server running at http://localhost:${port}`);

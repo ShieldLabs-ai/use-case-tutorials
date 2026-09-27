@@ -15,9 +15,11 @@
     "reset-db": "node -e \"import('./server/db.js').then((db) => db.resetDb())\""
   },
   "dependencies": {
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/static": "^10.1.5",
     "better-sqlite3": "^12.11.1",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "fastify": "^5.12.5"
   },
   "devDependencies": {
     "puppeteer": "^24.43.1"

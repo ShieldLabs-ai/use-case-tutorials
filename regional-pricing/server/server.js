@@ -1,37 +1,38 @@
 import 'dotenv/config';
-import express from 'express';
+import Fastify from 'fastify';
+import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
 import { initDb, resetDb } from './db.js';
 import { activateRegionalPrice, getPricing } from './pricing.js';
 
 initDb();
 
-const app = express();
-app.use(express.json());
-app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
+const app = Fastify();
+app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
 // The list price and the countries with their discount.
-app.get('/api/pricing', (_req, res) => {
-  res.json(getPricing());
+app.get('/api/pricing', async (_request, reply) => {
+  return reply.send(getPricing());
 });
 
 // Apply the regional price for a country.
-app.post('/api/regional-price', async (req, res) => {
-  const { country } = req.body ?? {};
-  res.json(await activateRegionalPrice({ country }));
+app.post('/api/regional-price', async (request, reply) => {
+  const { country } = request.body ?? {};
+  return reply.send(await activateRegionalPrice({ country }));
 });
 
 // Reset the demo database.
-app.post('/api/reset-db', (_req, res) => {
+app.post('/api/reset-db', async (_request, reply) => {
   resetDb();
-  res.json({ success: true, message: 'Demo database reset.' });
+  return reply.send({ success: true, message: 'Demo database reset.' });
 });
 
 // Show server errors in the response, to make the tutorial easy to debug.
-app.use((err, _req, res, _next) => {
-  console.error(err);
-  res.status(500).json({ success: false, message: `Server error: ${err.message}` });
+app.setErrorHandler((error, _request, reply) => {
+  console.error(error);
+  reply.status(500).send({ success: false, message: `Server error: ${error.message}` });
 });
 
 const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+await app.listen({ port });
+console.log(`Server running at http://localhost:${port}`);

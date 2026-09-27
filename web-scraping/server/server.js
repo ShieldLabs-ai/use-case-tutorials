@@ -1,36 +1,37 @@
 import 'dotenv/config';
-import express from 'express';
+import Fastify from 'fastify';
+import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
 import { initDb, resetDb } from './db.js';
 import { AIRPORTS, searchFlights } from './flights.js';
 
 initDb();
 
-const app = express();
-app.use(express.json());
-app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
+const app = Fastify();
+app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
-app.get('/api/airports', (_req, res) => {
-  res.json(AIRPORTS);
+app.get('/api/airports', async (_request, reply) => {
+  return reply.send(AIRPORTS);
 });
 
 // Search flights: the prices behind this endpoint are the data scrapers want.
-app.post('/api/flights', async (req, res) => {
-  const { from, to, date } = req.body ?? {};
-  res.json(await searchFlights({ from, to, date }));
+app.post('/api/flights', async (request, reply) => {
+  const { from, to, date } = request.body ?? {};
+  return reply.send(await searchFlights({ from, to, date }));
 });
 
 // Reset the demo database.
-app.post('/api/reset-db', (_req, res) => {
+app.post('/api/reset-db', async (_request, reply) => {
   resetDb();
-  res.json({ success: true, message: 'Demo database reset.' });
+  return reply.send({ success: true, message: 'Demo database reset.' });
 });
 
 // Show server errors in the response, to make the tutorial easy to debug.
-app.use((err, _req, res, _next) => {
-  console.error(err);
-  res.status(500).json({ success: false, message: `Server error: ${err.message}` });
+app.setErrorHandler((error, _request, reply) => {
+  console.error(error);
+  reply.status(500).send({ success: false, message: `Server error: ${error.message}` });
 });
 
 const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+await app.listen({ port });
+console.log(`Server running at http://localhost:${port}`);

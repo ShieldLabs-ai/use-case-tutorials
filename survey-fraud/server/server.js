@@ -1,32 +1,33 @@
 import 'dotenv/config';
-import express from 'express';
+import Fastify from 'fastify';
+import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
 import { initDb, resetDb } from './db.js';
 import { submitSurvey } from './survey.js';
 
 initDb();
 
-const app = express();
-app.use(express.json());
-app.use(express.static(fileURLToPath(new URL('../public', import.meta.url))));
+const app = Fastify();
+app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
 // Submit the survey.
-app.post('/api/survey', async (req, res) => {
-  const { email, answers } = req.body ?? {};
-  res.json(await submitSurvey({ email, answers }));
+app.post('/api/survey', async (request, reply) => {
+  const { email, answers } = request.body ?? {};
+  return reply.send(await submitSurvey({ email, answers }));
 });
 
 // Reset the demo database.
-app.post('/api/reset-db', (_req, res) => {
+app.post('/api/reset-db', async (_request, reply) => {
   resetDb();
-  res.json({ success: true, message: 'Demo database reset.' });
+  return reply.send({ success: true, message: 'Demo database reset.' });
 });
 
 // Show server errors in the response, to make the tutorial easy to debug.
-app.use((err, _req, res, _next) => {
-  console.error(err);
-  res.status(500).json({ success: false, message: `Server error: ${err.message}` });
+app.setErrorHandler((error, _request, reply) => {
+  console.error(error);
+  reply.status(500).send({ success: false, message: `Server error: ${error.message}` });
 });
 
 const port = Number(process.env.PORT) || 3000;
-app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
+await app.listen({ port });
+console.log(`Server running at http://localhost:${port}`);

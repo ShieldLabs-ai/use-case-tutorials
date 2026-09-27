@@ -10,10 +10,16 @@ initDb();
 const app = Fastify();
 app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
+// Expose only the Public Key to the browser. The Private API Key stays on the server.
+app.get('/config.js', async (_request, reply) => {
+  reply.type('application/javascript');
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+});
+
 // Send a verification code to a phone number.
 app.post('/api/send-code', async (request, reply) => {
-  const { phone } = request.body ?? {};
-  return reply.send(await sendCode({ phone }));
+  const { phone, requestId } = request.body ?? {};
+  return reply.send(await sendCode({ phone, requestId }));
 });
 
 app.post('/api/verify-code', async (request, reply) => {

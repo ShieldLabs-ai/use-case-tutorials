@@ -1,7 +1,12 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const phoneForm = document.getElementById('phoneForm');
 const codeForm = document.getElementById('codeForm');
 const sendBtn = document.getElementById('sendBtn');
 const result = document.getElementById('result');
+
+// Identify every code request, resends included, from the first focus on the form.
+const identification = identifyOnFirstFocus(phoneForm);
 
 phoneForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -9,7 +14,9 @@ phoneForm.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
-    const data = await postJson('/api/send-code', { phone });
+    // The request ID of this request's identification. The server reads the result.
+    const requestId = await identification.take();
+    const data = await postJson('/api/send-code', { phone, requestId });
     showResult(data.success ? 'success' : 'error', data.message);
     if (data.success) {
       // Stands in for the SMS arriving on the user's phone.

@@ -44,7 +44,7 @@ app.get('/api/search', async (request, reply) => {
 
 app.post('/api/saved', async (request, reply) => {
   const shopperId = shopperFor(request);
-  if (!shopperId) return reply.send({ success: false, message: 'Not saved: this browser could not be verified.' });
+  if (!shopperId) return reply.send({ success: false, message: 'Not saved: you could not be verified.' });
   return reply.send(toggleSaved(shopperId, request.body?.productId));
 });
 

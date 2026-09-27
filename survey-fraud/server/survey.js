@@ -24,7 +24,7 @@ export async function submitSurvey({ email, answers, requestId }) {
   // One paid submission per device: a new email address is not a new respondent.
   // The Device ID stays the same when cookies are cleared and in an incognito window.
   if (db.prepare('SELECT 1 FROM submissions WHERE device_id = ?').get(deviceId)) {
-    return { success: false, message: 'Submission refused: this device has already taken the survey.' };
+    return { success: false, message: 'Submission refused: you have already taken the survey.' };
   }
   if (db.prepare('SELECT 1 FROM submissions WHERE email = ?').get(email)) {
     return { success: false, message: 'This email address has already taken the survey.' };

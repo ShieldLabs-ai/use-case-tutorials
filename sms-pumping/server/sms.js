@@ -32,7 +32,7 @@ export async function sendCode({ phone, requestId }) {
     .prepare('SELECT created_at FROM sms_codes WHERE device_id = ? AND created_at >= ? ORDER BY created_at')
     .all(deviceId, Date.now() - DAY);
   if (sent.length >= MAX_CODES_PER_DEVICE) {
-    return { success: false, message: `No code sent: this device reached its limit of ${MAX_CODES_PER_DEVICE} codes a day.` };
+    return { success: false, message: `No code sent: you reached the limit of ${MAX_CODES_PER_DEVICE} codes a day.` };
   }
   const wait = sent.length ? WAIT_SECONDS[sent.length] * 1000 - (Date.now() - sent.at(-1).created_at) : 0;
   if (wait > 0) {

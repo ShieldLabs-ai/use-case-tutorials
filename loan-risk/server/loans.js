@@ -52,7 +52,7 @@ export async function applyForLoan({ firstName, lastName, monthlyIncome, amount,
     saveApplication(application, 'flagged');
     return {
       success: false,
-      message: 'This application needs a manual review: its name or income differs from an earlier application from this device.',
+      message: 'This application needs a manual review: its name or income differs from your earlier application.',
     };
   }
 

@@ -25,7 +25,7 @@ export async function signUp({ username, password, requestId }) {
   // One trial per device. The Device ID stays the same when cookies are cleared,
   // in an incognito window and on a new IP address.
   if (db.prepare('SELECT 1 FROM accounts WHERE device_id = ?').get(deviceId)) {
-    return { success: false, message: 'Signup refused: this device already has a trial account.' };
+    return { success: false, message: 'Signup refused: you already have a trial account.' };
   }
 
   db.prepare(

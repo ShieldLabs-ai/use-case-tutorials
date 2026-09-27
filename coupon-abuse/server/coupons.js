@@ -33,7 +33,7 @@ export async function applyCoupon({ code, requestId }) {
   // One redemption per code per device. The Device ID stays the same when cookies
   // are cleared, in an incognito window and on a new IP address.
   if (db.prepare('SELECT 1 FROM redemptions WHERE code = ? AND device_id = ?').get(coupon.code, deviceId)) {
-    return { success: false, message: `Coupon refused: ${coupon.code} was already used on this device.` };
+    return { success: false, message: `Coupon refused: you already used ${coupon.code}.` };
   }
 
   // Cycling through codes on one device: wait before a second, different code.
@@ -44,7 +44,7 @@ export async function applyCoupon({ code, requestId }) {
   if (wait > 0) {
     return {
       success: false,
-      message: `Coupon refused: this device used another code recently. Try again in ${Math.ceil(wait / 60000)} minutes.`,
+      message: `Coupon refused: you used another code recently. Try again in ${Math.ceil(wait / 60000)} minutes.`,
     };
   }
 

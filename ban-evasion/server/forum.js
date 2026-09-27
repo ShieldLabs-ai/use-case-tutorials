@@ -24,7 +24,7 @@ export async function signUp({ username, password, requestId }) {
 
   // A new account on a device a banned member used is the banned member coming back.
   if (isDeviceBanned(deviceId)) {
-    return { success: false, message: 'Signup refused: this device is banned.' };
+    return { success: false, message: 'Signup refused: you are banned from this forum.' };
   }
   if (findUser(username)) {
     return { success: false, message: 'That username is taken.' };
@@ -55,7 +55,7 @@ export async function signIn({ username, password, requestId }) {
     return { success: false, message: 'This account is banned.' };
   }
   if (isDeviceBanned(deviceId)) {
-    return { success: false, message: 'Sign-in refused: this device is banned.' };
+    return { success: false, message: 'Sign-in refused: you are banned from this forum.' };
   }
 
   rememberDevice(user.username, deviceId);

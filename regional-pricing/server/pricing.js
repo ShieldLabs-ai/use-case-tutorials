@@ -38,7 +38,7 @@ export async function activateRegionalPrice({ country, requestId }) {
     return { success: false, message: 'Regional pricing is not available over a VPN, a proxy or Tor. Turn it off and try again.' };
   }
   if (flags.timezone_mismatch) {
-    return { success: false, message: 'Regional pricing is not available: the time zone of this device does not match its location.' };
+    return { success: false, message: 'Regional pricing is not available: your time zone does not match your location.' };
   }
 
   // The discount follows the country of the connection (ISO code of the public IP).

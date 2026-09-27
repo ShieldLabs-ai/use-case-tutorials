@@ -38,7 +38,7 @@ export async function purchaseGiftCard({ recipientEmail, amount, cardNumber, exp
     )
     .get(deviceId, Date.now() - DAY);
   if (declines >= MAX_DECLINES_PER_DEVICE) {
-    return { success: false, message: 'Payment refused: too many declined cards from this device. Try again tomorrow.' };
+    return { success: false, message: 'Payment refused: too many declined cards. Try again tomorrow.' };
   }
 
   const approved = chargeCard(card);

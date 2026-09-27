@@ -124,7 +124,7 @@ function startChallenge(email, deviceId, country) {
     stepUp: true,
     challengeId: id,
     demoCode: code,
-    message: `New device. We sent a 6-digit code to ${name[0]}***@${domain}: enter it to finish signing in.`,
+    message: `Unrecognized sign-in. We sent a 6-digit code to ${name[0]}***@${domain}: enter it to finish signing in.`,
   };
 }
 

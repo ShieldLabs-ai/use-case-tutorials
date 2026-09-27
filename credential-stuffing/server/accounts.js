@@ -25,7 +25,7 @@ export async function signIn({ email, password, requestId }) {
     .prepare('SELECT COUNT(*) AS failures FROM failed_logins WHERE device_id = ? AND created_at >= ?')
     .get(deviceId, Date.now() - DAY);
   if (failures >= MAX_FAILURES_PER_DEVICE) {
-    return { success: false, message: 'Sign-in refused: too many failed attempts from this device. Try again tomorrow.' };
+    return { success: false, message: 'Sign-in refused: too many failed attempts. Try again tomorrow.' };
   }
 
   email = String(email ?? '').trim().toLowerCase();
@@ -91,6 +91,6 @@ function startChallenge(email, deviceId) {
     challenge: true,
     challengeId: id,
     demoCode: code,
-    message: 'New device: enter the 6-digit code we emailed you to finish signing in.',
+    message: 'Unrecognized sign-in: enter the 6-digit code we emailed you to finish signing in.',
   };
 }

@@ -1,9 +1,10 @@
 import { randomBytes } from 'node:crypto';
 import { db } from './db.js';
 import { hashPassword, verifyPassword } from './passwords.js';
+import { verifyIdentification } from './shieldlabs.js';
 
-// Creates a member account and signs it in.
-export async function signUp({ username, password }) {
+// Creates a member account and signs it in. Banned devices cannot create accounts.
+export async function signUp({ username, password, requestId }) {
   username = String(username ?? '').trim().toLowerCase();
   password = String(password ?? '');
   if (!/^[a-z0-9_]{3,20}$/.test(username)) {
@@ -11,6 +12,19 @@ export async function signUp({ username, password }) {
   }
   if (password.length < 6) {
     return { success: false, message: 'Use at least 6 characters for the password.' };
+  }
+
+  // Read the identification behind this signup. Unverified, automated and
+  // Dangerous signups are refused.
+  const check = await verifyIdentification(requestId);
+  if (!check.ok) {
+    return { success: false, message: `Signup refused: ${check.message}` };
+  }
+  const deviceId = check.identification.device_id;
+
+  // A new account on a device a banned member used is the banned member coming back.
+  if (isDeviceBanned(deviceId)) {
+    return { success: false, message: 'Signup refused: this device is banned.' };
   }
   if (findUser(username)) {
     return { success: false, message: 'That username is taken.' };
@@ -21,11 +35,18 @@ export async function signUp({ username, password }) {
     hashPassword(password),
     Date.now(),
   );
+  rememberDevice(username, deviceId);
   return startSession(username, `Welcome, ${username}. You can post now.`);
 }
 
-// Signs a member in. Banned accounts stay out.
-export async function signIn({ username, password }) {
+// Signs a member in. Banned accounts and banned devices stay out.
+export async function signIn({ username, password, requestId }) {
+  const check = await verifyIdentification(requestId);
+  if (!check.ok) {
+    return { success: false, message: `Sign-in refused: ${check.message}` };
+  }
+  const deviceId = check.identification.device_id;
+
   const user = findUser(String(username ?? '').trim().toLowerCase());
   if (!user || !verifyPassword(String(password ?? ''), user.password_hash)) {
     return { success: false, message: 'Incorrect username or password.' };
@@ -33,7 +54,11 @@ export async function signIn({ username, password }) {
   if (user.banned_at) {
     return { success: false, message: 'This account is banned.' };
   }
+  if (isDeviceBanned(deviceId)) {
+    return { success: false, message: 'Sign-in refused: this device is banned.' };
+  }
 
+  rememberDevice(user.username, deviceId);
   return startSession(user.username, `Signed in as ${user.username}.`);
 }
 
@@ -59,7 +84,8 @@ export function getBoard(token) {
   const members = db
     .prepare(
       `SELECT users.username, users.banned_at,
-         (SELECT COUNT(*) FROM posts WHERE posts.username = users.username) AS posts
+         (SELECT COUNT(*) FROM posts WHERE posts.username = users.username) AS posts,
+         (SELECT COUNT(*) FROM user_devices WHERE user_devices.username = users.username) AS devices
        FROM users ORDER BY users.created_at DESC`,
     )
     .all()
@@ -85,14 +111,23 @@ export function createPost(token, body) {
   return { success: true, message: 'Posted.' };
 }
 
-// Moderator action: ban a member and end their sessions.
+// Moderator action: ban a member, every device they used, and end their sessions.
 export function banUser(username) {
   const user = findUser(username);
   if (!user) return { success: false, message: 'No such member.' };
 
   db.prepare('UPDATE users SET banned_at = ? WHERE username = ?').run(Date.now(), user.username);
   db.prepare('DELETE FROM sessions WHERE username = ?').run(user.username);
-  return { success: true, message: `${user.username} is banned.` };
+
+  // The Device ID stays the same when cookies are cleared, in an incognito window
+  // and on a new IP address, so a fresh account on these devices is caught.
+  const { changes } = db
+    .prepare(
+      `INSERT OR IGNORE INTO banned_devices (device_id, username, banned_at)
+       SELECT device_id, username, ? FROM user_devices WHERE username = ?`,
+    )
+    .run(Date.now(), user.username);
+  return { success: true, message: `${user.username} is banned, with ${changes} ${changes === 1 ? 'device' : 'devices'}.` };
 }
 
 // --- Helpers ---
@@ -101,6 +136,18 @@ function findUser(username) {
   return db
     .prepare('SELECT username, password_hash, banned_at FROM users WHERE username = ?')
     .get(username);
+}
+
+function rememberDevice(username, deviceId) {
+  db.prepare('INSERT OR IGNORE INTO user_devices (username, device_id, first_seen) VALUES (?, ?, ?)').run(
+    username,
+    deviceId,
+    Date.now(),
+  );
+}
+
+function isDeviceBanned(deviceId) {
+  return Boolean(db.prepare('SELECT 1 FROM banned_devices WHERE device_id = ?').get(deviceId));
 }
 
 function startSession(username, message) {

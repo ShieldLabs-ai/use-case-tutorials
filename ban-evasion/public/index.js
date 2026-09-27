@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const accountForm = document.getElementById('accountForm');
 const postForm = document.getElementById('postForm');
 const result = document.getElementById('result');
+
+// Identify the signup or sign-in when the user starts filling in the form.
+const identification = identifyOnFirstFocus(accountForm);
 
 await loadBoard();
 
@@ -13,7 +18,9 @@ accountForm.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
-    const data = await postJson(`/api/${action}`, { username, password });
+    // The request ID of this identification. The server reads the result.
+    const requestId = await identification.take();
+    const data = await postJson(`/api/${action}`, { username, password, requestId });
     showResult(data.success ? 'success' : 'error', data.message);
     if (data.success) accountForm.reset();
     await loadBoard();
@@ -70,7 +77,7 @@ function renderPost(post) {
 
 function renderMember(member) {
   const item = el('li', 'flex items-center justify-between gap-2 py-2');
-  item.append(el('span', '', `${member.username} (${plural(member.posts, 'post')})`));
+  item.append(el('span', '', `${member.username} (${plural(member.posts, 'post')}, ${plural(member.devices, 'device')})`));
 
   if (member.banned) {
     item.append(el('span', 'text-xs font-medium text-red-700', 'Banned'));

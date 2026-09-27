@@ -12,6 +12,12 @@ const app = Fastify();
 app.register(fastifyCookie);
 app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
+// Expose only the Public Key to the browser. The Private API Key stays on the server.
+app.get('/config.js', async (_request, reply) => {
+  reply.type('application/javascript');
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+});
+
 // The board: posts, members and the signed-in member.
 app.get('/api/board', async (request, reply) => {
   return reply.send(getBoard(sessionToken(request)));
@@ -19,13 +25,13 @@ app.get('/api/board', async (request, reply) => {
 
 // Create an account, or sign in to an existing one.
 app.post('/api/signup', async (request, reply) => {
-  const { username, password } = request.body ?? {};
-  return sendWithSession(reply, await signUp({ username, password }));
+  const { username, password, requestId } = request.body ?? {};
+  return sendWithSession(reply, await signUp({ username, password, requestId }));
 });
 
 app.post('/api/signin', async (request, reply) => {
-  const { username, password } = request.body ?? {};
-  return sendWithSession(reply, await signIn({ username, password }));
+  const { username, password, requestId } = request.body ?? {};
+  return sendWithSession(reply, await signIn({ username, password, requestId }));
 });
 
 app.post('/api/signout', async (request, reply) => {

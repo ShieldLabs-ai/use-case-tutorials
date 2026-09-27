@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const form = document.getElementById('orderForm');
 const button = document.getElementById('buyBtn');
 const result = document.getElementById('result');
+
+// Identify the order when the user starts filling in the form.
+const identification = identifyOnFirstFocus(form);
 
 await renderEvents();
 
@@ -15,6 +20,8 @@ form.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
+    // The request ID of this order's identification. The server reads the result.
+    order.requestId = await identification.take();
     const data = await postJson('/api/orders', order);
     showResult(data.success ? 'success' : 'error', data.message);
   } catch (error) {

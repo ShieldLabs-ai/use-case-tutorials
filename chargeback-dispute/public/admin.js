@@ -52,7 +52,7 @@ async function showEvidence(orderId) {
     showResult('error', data.message);
     return;
   }
-  const { order, sameEmail } = data;
+  const { order, sameEmail, sameDevice, deviceHistory } = data;
 
   evidencePanel.replaceChildren(
     el('h2', 'text-lg font-semibold', `Dispute evidence for order #${order.id}`),
@@ -62,12 +62,15 @@ async function showEvidence(orderId) {
       `Tickets sent to ${order.email}, paid with the card ending ${order.card_last4}`,
       `Placed ${formatDate(order.created_at)}`,
     ]),
+    section('The identification at checkout', [
+      `Device ID ${order.device_id}`,
+      `Public IP ${order.ip ?? 'unknown'}, country ${order.country ?? 'unknown'}`,
+      `Risk Score ${order.risk_score} (${order.band})`,
+      `Request ID ${order.request_id}`,
+    ]),
+    section('Earlier orders from the same device, never disputed', sameDevice.map(describeOrder)),
+    section('This device in ShieldLabs History', describeHistory(deviceHistory)),
     section('Other orders with this email', sameEmail.map(describeOrder)),
-    el(
-      'p',
-      'mt-6 text-sm text-slate-500',
-      'Nothing ties this order to the device that placed it, so the dispute is your word against the cardholder.',
-    ),
   );
   evidencePanel.classList.remove('hidden');
   evidencePanel.scrollIntoView({ behavior: 'smooth' });
@@ -82,6 +85,16 @@ function section(title, lines) {
   list.append(...items.map((line) => el('li', '', line)));
   wrapper.append(el('h3', 'text-sm font-semibold', title), list);
   return wrapper;
+}
+
+function describeHistory(history) {
+  if (history.error) return [history.error];
+  if (history.identifications === 0) return ['No identifications of this device in the History API.'];
+  return [
+    `${history.identifications} identifications between ${history.firstSeen.slice(0, 16)} and ${history.lastSeen.slice(0, 16)} UTC`,
+    `Countries: ${history.countries.join(', ')}`,
+    `Public IPs: ${history.publicIps.join(', ')}`,
+  ];
 }
 
 function describeOrder(order) {

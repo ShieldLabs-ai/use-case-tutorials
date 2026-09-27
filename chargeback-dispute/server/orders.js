@@ -1,8 +1,9 @@
 import { db } from './db.js';
 import { findEvent } from './events.js';
+import { band, readHistory, verifyIdentification } from './shieldlabs.js';
 
 // Places a ticket order. The payment is simulated and always approved.
-export async function placeOrder({ eventId, quantity, email, cardNumber }) {
+export async function placeOrder({ eventId, quantity, email, cardNumber, requestId }) {
   const event = findEvent(eventId);
   quantity = Number(quantity);
   email = String(email ?? '').trim().toLowerCase();
@@ -19,12 +20,36 @@ export async function placeOrder({ eventId, quantity, email, cardNumber }) {
     return { success: false, message: 'Enter a card number.' };
   }
 
+  // Read the identification behind this order. Unverified, automated and
+  // Dangerous orders are refused.
+  const check = await verifyIdentification(requestId);
+  if (!check.ok) {
+    return { success: false, message: `Order refused: ${check.message}` };
+  }
+
+  // Keep the identification with the order: it is the evidence if the order is
+  // disputed later.
+  const { device_id: deviceId, public_ip: publicIp, risk_score: riskScore } = check.identification;
   const { lastInsertRowid } = db
     .prepare(
-      `INSERT INTO orders (event_id, event_name, quantity, total, email, card_last4, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO orders (event_id, event_name, quantity, total, email, card_last4,
+         device_id, ip, country, risk_score, request_id, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .run(event.id, event.name, quantity, event.price * quantity, email, card.slice(-4), Date.now());
+    .run(
+      event.id,
+      event.name,
+      quantity,
+      event.price * quantity,
+      email,
+      card.slice(-4),
+      deviceId,
+      publicIp.ip,
+      publicIp.country,
+      riskScore,
+      check.identification.request_id,
+      Date.now(),
+    );
 
   const tickets = quantity === 1 ? '1 ticket' : `${quantity} tickets`;
   return {
@@ -63,9 +88,42 @@ export async function getEvidence(orderId) {
     .prepare('SELECT * FROM orders WHERE email = ? AND id != ? ORDER BY created_at DESC')
     .all(order.email, order.id);
 
-  return { success: true, order, sameEmail };
+  // Earlier orders from the same device that were never disputed: the strongest
+  // sign that the cardholder placed the disputed order too.
+  const sameDevice = db
+    .prepare(
+      `SELECT * FROM orders WHERE device_id = ? AND id != ? AND created_at < ? AND chargeback_at IS NULL
+       ORDER BY created_at DESC`,
+    )
+    .all(order.device_id, order.id, order.created_at);
+
+  return {
+    success: true,
+    order: { ...order, band: band(order.risk_score) },
+    sameEmail,
+    sameDevice,
+    deviceHistory: await summarizeDevice(order.device_id),
+  };
 }
 
 function findOrder(id) {
   return db.prepare('SELECT * FROM orders WHERE id = ?').get(Number(id));
+}
+
+// The device's history in ShieldLabs: its newest 100 identifications on your site.
+async function summarizeDevice(deviceId) {
+  try {
+    const rows = await readHistory('device_id', deviceId, 100);
+    const times = rows.map((row) => row.created_at).sort();
+    return {
+      identifications: rows.length,
+      firstSeen: times[0] ?? null,
+      lastSeen: times.at(-1) ?? null,
+      countries: [...new Set(rows.map((row) => row.country).filter(Boolean))],
+      publicIps: [...new Set(rows.map((row) => row.ip).filter(Boolean))],
+    };
+  } catch (error) {
+    console.error(`[shieldlabs] device history: ${error.message}`);
+    return { error: 'The History API could not be read.' };
+  }
 }

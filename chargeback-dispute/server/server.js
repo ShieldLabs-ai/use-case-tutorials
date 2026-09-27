@@ -11,14 +11,20 @@ initDb();
 const app = Fastify();
 app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
+// Expose only the Public Key to the browser. The Private API Key stays on the server.
+app.get('/config.js', async (_request, reply) => {
+  reply.type('application/javascript');
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+});
+
 // The shop.
 app.get('/api/events', async (_request, reply) => {
   return reply.send(EVENTS);
 });
 
 app.post('/api/orders', async (request, reply) => {
-  const { eventId, quantity, email, cardNumber } = request.body ?? {};
-  return reply.send(await placeOrder({ eventId, quantity, email, cardNumber }));
+  const { eventId, quantity, email, cardNumber, requestId } = request.body ?? {};
+  return reply.send(await placeOrder({ eventId, quantity, email, cardNumber, requestId }));
 });
 
 // The admin page (admin.html). The demo has no admin login.

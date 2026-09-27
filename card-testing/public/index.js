@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const form = document.getElementById('checkoutForm');
 const button = document.getElementById('buyBtn');
 const result = document.getElementById('result');
+
+// Identify the checkout when the user starts filling in the form.
+const identification = identifyOnFirstFocus(form);
 
 await loadAttempts();
 
@@ -16,6 +21,8 @@ form.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
+    // The request ID of this checkout's identification. The server reads the result.
+    order.requestId = await identification.take();
     const data = await postJson('/api/purchase', order);
     showResult(data.success ? 'success' : 'error', data.message);
     await loadAttempts();

@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const form = document.getElementById('surveyForm');
 const button = document.getElementById('submitBtn');
 const result = document.getElementById('result');
+
+// Identify the submission when the respondent starts answering.
+const identification = identifyOnFirstFocus(form);
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -15,6 +20,8 @@ form.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
+    // The request ID of this submission's identification. The server reads the result.
+    submission.requestId = await identification.take();
     const data = await postJson('/api/survey', submission);
     showResult(data.success ? 'success' : 'error', data.message);
   } catch (error) {

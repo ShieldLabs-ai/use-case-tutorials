@@ -1,4 +1,5 @@
 import { db } from './db.js';
+import { verifyIdentification } from './shieldlabs.js';
 
 export const AIRPORTS = [
   { code: 'JFK', city: 'New York' },
@@ -17,7 +18,15 @@ const AIRLINES = [
 ];
 
 // Returns the flights and prices for a route and a date: the data a scraper wants.
-export async function searchFlights({ from, to, date }) {
+export async function searchFlights({ from, to, date, requestId }) {
+  // Read the identification behind this search first. Requests without a verified
+  // identification (such as direct API calls), browser automation, disabled
+  // JavaScript and Dangerous traffic get no data.
+  const check = await verifyIdentification(requestId);
+  if (!check.ok) {
+    return { success: false, flights: [], message: `No flights shown: ${check.message}` };
+  }
+
   const origin = AIRPORTS.find((airport) => airport.code === from);
   const destination = AIRPORTS.find((airport) => airport.code === to);
   if (!origin || !destination || origin === destination) {
@@ -27,12 +36,9 @@ export async function searchFlights({ from, to, date }) {
     return { success: false, flights: [], message: 'Pick a travel date.' };
   }
 
-  db.prepare('INSERT INTO searches (origin, destination, date, created_at) VALUES (?, ?, ?, ?)').run(
-    origin.code,
-    destination.code,
-    date,
-    Date.now(),
-  );
+  db.prepare(
+    'INSERT INTO searches (origin, destination, date, device_id, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+  ).run(origin.code, destination.code, date, check.identification.device_id, check.identification.request_id, Date.now());
 
   const flights = buildSchedule(origin.code, destination.code, date);
   return {

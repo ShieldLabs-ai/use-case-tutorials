@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const form = document.getElementById('searchForm');
 const button = document.getElementById('searchBtn');
 const result = document.getElementById('result');
+
+// Identify every search, starting when the user begins filling in the form.
+const identification = identifyOnFirstFocus(form);
 
 await setUpForm();
 
@@ -14,6 +19,8 @@ form.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
+    // The request ID of this search's identification. The server reads the result.
+    search.requestId = await identification.take();
     const data = await postJson('/api/flights', search);
     showResult(data.success ? 'success' : 'error', data.message);
     renderFlights(data.flights ?? []);

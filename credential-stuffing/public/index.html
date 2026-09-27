@@ -46,6 +46,25 @@
         </p>
       </form>
 
+      <form id="codeForm" class="mt-4 hidden space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-6">
+        <p class="text-sm font-medium">Confirm it is you</p>
+        <p class="rounded-md bg-slate-900 p-3 text-sm text-slate-100">
+          Demo email: your sign-in code is <span id="demoCode" class="font-mono font-semibold"></span>
+        </p>
+        <input
+          id="code"
+          name="code"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          placeholder="6-digit code"
+          required
+          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2"
+        />
+        <button type="submit" class="w-full rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-700">
+          Verify and sign in
+        </button>
+      </form>
+
       <div id="result" class="hidden" role="status"></div>
 
       <footer class="mt-10 text-center text-xs text-slate-500">
@@ -53,6 +72,7 @@
       </footer>
     </main>
 
+    <script src="/config.js"></script>
     <script type="module" src="/index.js"></script>
   </body>
 </html>

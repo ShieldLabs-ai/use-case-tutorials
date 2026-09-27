@@ -7,12 +7,39 @@ export const db = new Database(fileURLToPath(new URL('../db.sqlite', import.meta
 
 // Bump this when the tables change. A database with another version (for example
 // after you switch between the starter and final branches) is recreated.
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 const TABLES = [
   `CREATE TABLE IF NOT EXISTS accounts (
     email TEXT PRIMARY KEY,
     password_hash TEXT NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS failed_logins (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    email TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  // The devices each account signed in from.
+  `CREATE TABLE IF NOT EXISTS known_devices (
+    email TEXT NOT NULL,
+    device_id TEXT NOT NULL,
+    first_seen INTEGER NOT NULL,
+    PRIMARY KEY (email, device_id)
+  )`,
+  // Sign-ins from new devices waiting for the one-time code.
+  `CREATE TABLE IF NOT EXISTS sign_in_challenges (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    device_id TEXT NOT NULL,
+    code TEXT NOT NULL,
+    attempts INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+  )`,
+  // Request IDs already used for an action (see server/shieldlabs.js).
+  `CREATE TABLE IF NOT EXISTS used_request_ids (
+    request_id TEXT PRIMARY KEY,
+    used_at INTEGER NOT NULL
   )`,
 ];
 

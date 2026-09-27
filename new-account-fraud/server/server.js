@@ -10,10 +10,16 @@ initDb();
 const app = Fastify();
 app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
+// Expose only the Public Key to the browser. The Private API Key stays on the server.
+app.get('/config.js', async (_request, reply) => {
+  reply.type('application/javascript');
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+});
+
 // Start a free trial.
 app.post('/api/signup', async (request, reply) => {
-  const { username, password } = request.body ?? {};
-  return reply.send(await signUp({ username, password }));
+  const { username, password, requestId } = request.body ?? {};
+  return reply.send(await signUp({ username, password, requestId }));
 });
 
 // Reset the demo database.

@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const form = document.getElementById('signupForm');
 const button = document.getElementById('signupBtn');
 const result = document.getElementById('result');
+
+// Identify the signup when the user starts filling in the form.
+const identification = identifyOnFirstFocus(form);
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -9,7 +14,9 @@ form.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
-    const data = await postJson('/api/signup', { username, password });
+    // The request ID of this signup's identification. The server reads the result.
+    const requestId = await identification.take();
+    const data = await postJson('/api/signup', { username, password, requestId });
     showResult(data.success ? 'success' : 'error', data.message);
   } catch (error) {
     console.error(error);

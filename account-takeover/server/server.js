@@ -4,7 +4,7 @@ import fastifyCookie from '@fastify/cookie';
 import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
 import { initDb, resetDb } from './db.js';
-import { getAccount, signIn, signOut } from './accounts.js';
+import { getAccount, signIn, signOut, verifyCode } from './accounts.js';
 
 initDb();
 
@@ -12,10 +12,24 @@ const app = Fastify();
 app.register(fastifyCookie);
 app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
+// Expose only the Public Key to the browser. The Private API Key stays on the server.
+app.get('/config.js', async (_request, reply) => {
+  reply.type('application/javascript');
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+});
+
 // Sign in and store the session token in a cookie.
 app.post('/api/login', async (request, reply) => {
-  const { email, password } = request.body ?? {};
-  const { token, ...result } = await signIn({ email, password });
+  const { email, password, requestId } = request.body ?? {};
+  const { token, ...result } = await signIn({ email, password, requestId });
+  if (token) reply.setCookie('session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
+  return reply.send(result);
+});
+
+// Finish a sign-in from a new device with the one-time code.
+app.post('/api/verify-code', async (request, reply) => {
+  const { challengeId, code } = request.body ?? {};
+  const { token, ...result } = await verifyCode({ challengeId, code });
   if (token) reply.setCookie('session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
   return reply.send(result);
 });

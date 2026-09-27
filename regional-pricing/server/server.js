@@ -10,6 +10,12 @@ initDb();
 const app = Fastify();
 app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
+// Expose only the Public Key to the browser. The Private API Key stays on the server.
+app.get('/config.js', async (_request, reply) => {
+  reply.type('application/javascript');
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+});
+
 // The list price and the countries with their discount.
 app.get('/api/pricing', async (_request, reply) => {
   return reply.send(getPricing());
@@ -17,8 +23,8 @@ app.get('/api/pricing', async (_request, reply) => {
 
 // Apply the regional price for a country.
 app.post('/api/regional-price', async (request, reply) => {
-  const { country } = request.body ?? {};
-  return reply.send(await activateRegionalPrice({ country }));
+  const { country, requestId } = request.body ?? {};
+  return reply.send(await activateRegionalPrice({ country, requestId }));
 });
 
 // Reset the demo database.

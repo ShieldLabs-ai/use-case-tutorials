@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const form = document.getElementById('regionForm');
 const button = document.getElementById('activateBtn');
 const result = document.getElementById('result');
+
+// Identify the request when the shopper starts picking a country.
+const identification = identifyOnFirstFocus(form);
 
 const pricing = await (await fetch('/api/pricing')).json();
 renderCountries();
@@ -12,7 +17,9 @@ form.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
-    const data = await postJson('/api/regional-price', { country });
+    // The request ID of this request's identification. The server reads the result.
+    const requestId = await identification.take();
+    const data = await postJson('/api/regional-price', { country, requestId });
     showResult(data.success ? 'success' : 'error', data.message);
     renderTotals(data.success ? data.price : pricing.listPrice);
   } catch (error) {

@@ -6,7 +6,7 @@ export const db = new Database(fileURLToPath(new URL('../db.sqlite', import.meta
 
 // Bump this when the tables change. A database with another version (for example
 // after you switch between the starter and final branches) is recreated.
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 const TABLES = [
   `CREATE TABLE IF NOT EXISTS searches (
@@ -20,6 +20,17 @@ const TABLES = [
     product_id INTEGER NOT NULL,
     created_at INTEGER NOT NULL,
     PRIMARY KEY (shopper_id, product_id)
+  )`,
+  // Maps a browser's session cookie to the Device ID of its identification.
+  `CREATE TABLE IF NOT EXISTS device_sessions (
+    token TEXT PRIMARY KEY,
+    device_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  // Request IDs already used for an action (see server/shieldlabs.js).
+  `CREATE TABLE IF NOT EXISTS used_request_ids (
+    request_id TEXT PRIMARY KEY,
+    used_at INTEGER NOT NULL
   )`,
 ];
 

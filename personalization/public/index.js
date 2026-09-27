@@ -1,7 +1,12 @@
+import { identify } from './shieldlabs.js';
+
 const searchForm = document.getElementById('searchForm');
 const result = document.getElementById('result');
 
 let profile = await getJson('/api/profile');
+// A browser without a session (first visit, incognito window, cleared cookies):
+// identify it once, and the server finds the history of its Device ID.
+if (!profile.identified) profile = await identifyBrowser();
 let results = [];
 renderProfile();
 await runSearch('');
@@ -37,6 +42,17 @@ async function toggleSaved(product) {
 async function refreshProfile() {
   profile = await getJson('/api/profile');
   renderProfile();
+}
+
+async function identifyBrowser() {
+  const requestId = await identify();
+  const data = await postJson('/api/session', { requestId });
+  if (!data.success) {
+    showResult('error', data.message);
+    return { identified: false, recentSearches: [], saved: [] };
+  }
+  if (data.returning) showResult('success', 'Welcome back: your recent searches and saved items are here.');
+  return data.profile;
 }
 
 // --- Rendering ---

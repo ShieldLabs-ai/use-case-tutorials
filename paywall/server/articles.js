@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { db } from './db.js';
+import { verifyIdentification } from './shieldlabs.js';
 
 const ARTICLES = JSON.parse(readFileSync(new URL('./data/articles.json', import.meta.url), 'utf8'));
 const FREE_ARTICLES_PER_DAY = 2;
@@ -11,12 +12,21 @@ export function listArticles() {
 }
 
 // Opens an article while the reader has free articles left. The meter counts
-// distinct articles over the last 24 hours, keyed by the reader's meter cookie.
-export async function readArticle({ articleId, meterId }) {
+// distinct articles over the last 24 hours per Device ID, which stays the same in
+// an incognito window, after cookies are cleared and on a new IP address.
+export async function readArticle({ articleId, requestId }) {
   const article = ARTICLES.find((item) => item.id === Number(articleId));
   if (!article) return { success: false, message: 'Article not found.' };
 
-  const readToday = articlesReadSince(meterId, Date.now() - DAY);
+  // Read the identification behind this article view. Unverified, automated and
+  // Dangerous views are refused.
+  const check = await verifyIdentification(requestId);
+  if (!check.ok) {
+    return { success: false, message: `Article locked: ${check.message}` };
+  }
+  const { device_id: deviceId, request_id: checkedRequestId } = check.identification;
+
+  const readToday = articlesReadSince(deviceId, Date.now() - DAY);
   const alreadyRead = readToday.includes(article.id);
 
   if (!alreadyRead && readToday.length >= FREE_ARTICLES_PER_DAY) {
@@ -27,9 +37,10 @@ export async function readArticle({ articleId, meterId }) {
   }
 
   if (!alreadyRead) {
-    db.prepare('INSERT INTO article_views (meter_id, article_id, created_at) VALUES (?, ?, ?)').run(
-      meterId,
+    db.prepare('INSERT INTO article_views (device_id, article_id, request_id, created_at) VALUES (?, ?, ?, ?)').run(
+      deviceId,
       article.id,
+      checkedRequestId,
       Date.now(),
     );
   }
@@ -41,9 +52,9 @@ export async function readArticle({ articleId, meterId }) {
   };
 }
 
-function articlesReadSince(meterId, since) {
+function articlesReadSince(deviceId, since) {
   return db
-    .prepare('SELECT DISTINCT article_id FROM article_views WHERE meter_id = ? AND created_at >= ?')
-    .all(meterId, since)
+    .prepare('SELECT DISTINCT article_id FROM article_views WHERE device_id = ? AND created_at >= ?')
+    .all(deviceId, since)
     .map((row) => row.article_id);
 }

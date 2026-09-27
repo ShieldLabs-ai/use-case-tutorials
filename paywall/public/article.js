@@ -1,11 +1,15 @@
+import { identify } from './shieldlabs.js';
+
 const articleId = new URLSearchParams(location.search).get('id');
 const result = document.getElementById('result');
 
 try {
+  // Identify every article view. The server meters free articles by Device ID.
+  const requestId = await identify();
   const response = await fetch(`/api/articles/${encodeURIComponent(articleId)}/read`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({}),
+    body: JSON.stringify({ requestId }),
   });
   const data = await response.json();
 

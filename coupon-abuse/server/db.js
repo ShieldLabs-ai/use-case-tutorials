@@ -6,7 +6,7 @@ export const db = new Database(fileURLToPath(new URL('../db.sqlite', import.meta
 
 // Bump this when the tables change. A database with another version (for example
 // after you switch between the starter and final branches) is recreated.
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 const TABLES = [
   `CREATE TABLE IF NOT EXISTS coupons (
@@ -17,7 +17,14 @@ const TABLES = [
   `CREATE TABLE IF NOT EXISTS redemptions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT NOT NULL,
+    device_id TEXT NOT NULL,
+    request_id TEXT NOT NULL,
     created_at INTEGER NOT NULL
+  )`,
+  // Request IDs already used for an action (see server/shieldlabs.js).
+  `CREATE TABLE IF NOT EXISTS used_request_ids (
+    request_id TEXT PRIMARY KEY,
+    used_at INTEGER NOT NULL
   )`,
 ];
 

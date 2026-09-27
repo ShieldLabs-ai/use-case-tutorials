@@ -10,14 +10,20 @@ initDb();
 const app = Fastify();
 app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.meta.url)) });
 
+// Expose only the Public Key to the browser. The Private API Key stays on the server.
+app.get('/config.js', async (_request, reply) => {
+  reply.type('application/javascript');
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+});
+
 app.get('/api/cart', async (_request, reply) => {
   return reply.send(getCart());
 });
 
 // Apply a coupon code to the cart.
 app.post('/api/coupons/apply', async (request, reply) => {
-  const { code } = request.body ?? {};
-  return reply.send(await applyCoupon({ code }));
+  const { code, requestId } = request.body ?? {};
+  return reply.send(await applyCoupon({ code, requestId }));
 });
 
 // Reset the demo database.

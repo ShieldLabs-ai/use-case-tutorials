@@ -1,6 +1,11 @@
+import { identifyOnFirstFocus } from './shieldlabs.js';
+
 const form = document.getElementById('couponForm');
 const button = document.getElementById('applyBtn');
 const result = document.getElementById('result');
+
+// Identify the redemption when the user starts typing a code.
+const identification = identifyOnFirstFocus(form);
 
 const cart = await (await fetch('/api/cart')).json();
 renderCart();
@@ -11,7 +16,9 @@ form.addEventListener('submit', async (event) => {
 
   setBusy(true);
   try {
-    const data = await postJson('/api/coupons/apply', { code });
+    // The request ID of this redemption's identification. The server reads the result.
+    const requestId = await identification.take();
+    const data = await postJson('/api/coupons/apply', { code, requestId });
     showResult(data.success ? 'success' : 'error', data.message);
     renderTotals(data.success ? data : null);
   } catch (error) {

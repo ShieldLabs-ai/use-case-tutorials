@@ -1,0 +1,99 @@
+import { randomBytes } from 'node:crypto';
+import { db } from './db.js';
+import { verifyIdentification } from './shieldlabs.js';
+
+const REWARD_CENTS = 1000; // $10
+
+// Creates an account and, if a referral code was entered, credits the reward:
+// $10 to the new signup and $10 to the code's owner, but only when the two are on
+// different devices. The Device ID stored with the referrer's account is the one
+// behind their own signup, captured once, at that time.
+export async function signUp({ email, referralCode, requestId }) {
+  email = String(email ?? '').trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    return { success: false, message: 'Enter a valid email address.' };
+  }
+
+  // Read the identification behind this signup. Unverified, automated and
+  // Dangerous signups are refused before the account is created.
+  const check = await verifyIdentification(requestId);
+  if (!check.ok) {
+    return { success: false, message: `Signup refused: ${check.message}` };
+  }
+  const deviceId = check.identification.device_id;
+
+  if (findAccount(email)) {
+    return { success: false, message: 'An account with that email already exists.' };
+  }
+
+  const code = referralCode ? String(referralCode).trim().toUpperCase() : null;
+  const referrer = code ? findByReferralCode(code) : null;
+
+  let creditCents = 0;
+  let message = 'Account created.';
+  if (code && !referrer) {
+    message = 'Account created. That referral code was not recognized.';
+  } else if (referrer && referrer.device_id === deviceId) {
+    message = 'Account created. No referral reward: this device already referred itself (self-referral detected).';
+  } else if (referrer) {
+    creditCents = REWARD_CENTS;
+    creditAccount(referrer.email, REWARD_CENTS);
+    message = 'Account created. You and your friend both earned $10 for the referral.';
+  }
+
+  const ownReferralCode = generateReferralCode(email);
+  db.prepare(
+    'INSERT INTO accounts (email, referral_code, device_id, credit_cents, created_at) VALUES (?, ?, ?, ?, ?)',
+  ).run(email, ownReferralCode, deviceId, creditCents, Date.now());
+
+  const token = createSession(email);
+  return { success: true, token, email, referralCode: ownReferralCode, creditCents, message };
+}
+
+// Returns the state of the session behind a cookie.
+export function getSession(token) {
+  const session = token ? db.prepare('SELECT email FROM sessions WHERE token = ?').get(token) : null;
+  const account = session ? findAccount(session.email) : null;
+  if (!account) return { signedIn: false };
+  return {
+    signedIn: true,
+    email: account.email,
+    referralCode: account.referral_code,
+    creditCents: account.credit_cents,
+  };
+}
+
+export function endSession(token) {
+  db.prepare('DELETE FROM sessions WHERE token = ?').run(token ?? '');
+}
+
+// --- Helpers ---
+
+function findAccount(email) {
+  return db.prepare('SELECT * FROM accounts WHERE email = ?').get(email);
+}
+
+function findByReferralCode(code) {
+  return db.prepare('SELECT * FROM accounts WHERE referral_code = ?').get(code);
+}
+
+function creditAccount(email, cents) {
+  db.prepare('UPDATE accounts SET credit_cents = credit_cents + ? WHERE email = ?').run(cents, email);
+}
+
+function createSession(email) {
+  const token = randomBytes(24).toString('hex');
+  db.prepare('INSERT INTO sessions (token, email, created_at) VALUES (?, ?, ?)').run(token, email, Date.now());
+  return token;
+}
+
+// The account's own referral code: the email's local part, uppercased, plus 3
+// random digits, for example RILEY482.
+function generateReferralCode(email) {
+  const local = email.split('@')[0].replace(/[^a-z0-9]/gi, '').toUpperCase() || 'MEMBER';
+  let code;
+  do {
+    code = `${local}${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+  } while (findByReferralCode(code));
+  return code;
+}

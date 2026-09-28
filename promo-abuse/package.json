@@ -1,0 +1,26 @@
+{
+  "name": "shieldlabs-promo-abuse-tutorial",
+  "version": "1.0.0",
+  "description": "Promo abuse prevention demo",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "server/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node --watch server/server.js",
+    "start": "node server/server.js",
+    "reset-db": "node -e \"import('./server/db.js').then((db) => db.resetDb())\""
+  },
+  "dependencies": {
+    "@fastify/static": "^10.1.5",
+    "better-sqlite3": "^12.11.1",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.12.5"
+  },
+  "devDependencies": {
+    "puppeteer": "^24.43.1"
+  }
+}

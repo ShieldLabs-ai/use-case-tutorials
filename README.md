@@ -15,9 +15,12 @@ git diff starter final -- new-account-fraud
 - [**Account sharing prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/account-sharing): keep one device signed in per account and let the owner sign the other device out.
 - [**Account takeover prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/account-takeover): step up a sign-in that brings the right password from a device the account has never used.
 - [**Ban evasion prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/ban-evasion): ban every device a banned user signed in from, so a fresh account does not get them back in.
+- [**Bonus abuse prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/bonus-abuse): pay a welcome deposit-match bonus once per device, no matter how many accounts try to claim it.
 - [**Card testing prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/card-testing): cap declined card attempts per device and refuse automated checkouts.
 - [**Chargeback dispute evidence**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/chargeback-dispute): store the device behind every order and assemble evidence against friendly-fraud chargebacks.
 - [**Coupon abuse prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/coupon-abuse): allow one redemption per code per device, with a cooldown before a second code.
+- [**Promo abuse prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/promo-abuse): apply an automatic first-order discount once per device, not once per email address.
+- [**Referral fraud prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/referral-fraud): pay a referral reward only when the referrer and the new signup are on different devices.
 - [**Credential stuffing prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/credential-stuffing): limit failed sign-ins per device, refuse automation and challenge sign-ins from unknown devices.
 - [**Loan application fraud prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/loan-risk): flag applications whose name or income changes between attempts from the same device.
 - [**New account fraud prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/new-account-fraud): allow one free trial per device and refuse automated or Dangerous signups.
@@ -25,6 +28,7 @@ git diff starter final -- new-account-fraud
 - [**Returning visitor personalization**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/personalization): keep search history and saved items for a returning device, even in incognito or after cookies are cleared.
 - [**Regional pricing enforcement**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/regional-pricing): apply a regional discount only for the country of an unmasked connection.
 - [**SMS pumping prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/sms-pumping): cap verification codes per device with a growing wait, and refuse automation and Tor.
+- [**Sybil attack prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/sybil-attack): accept one airdrop claim per device, no matter how many wallet addresses try.
 - [**Survey fraud prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/survey-fraud): accept one paid survey submission per device.
 - [**Web scraping prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/web-scraping): serve flight prices to real browsers and refuse automated requests.
 

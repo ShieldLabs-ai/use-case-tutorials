@@ -38,7 +38,7 @@ export async function checkout({ email }) {
     subtotal: subtotalCents / 100,
     discount: discountCents / 100,
     total: totalCents / 100,
-    message: `Order confirmed for ${money(subtotalCents)} (20% first-order discount applied). Total: ${money(totalCents)}, sent to ${email}.`,
+    message: `Order confirmed with 20% off your first order: ${money(totalCents)} instead of ${money(subtotalCents)}.`,
   };
 }
 

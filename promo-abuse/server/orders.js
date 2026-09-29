@@ -57,8 +57,8 @@ export async function checkout({ email, requestId }, reply) {
   markOrderedBeforeHint(reply);
 
   const message = hasOrderedBefore
-    ? `Order confirmed for ${money(totalCents)}. This device already used its first-order discount, so no discount applied this time. Total: ${money(totalCents)}.`
-    : `Order confirmed for ${money(subtotalCents)} (20% first-order discount applied). Total: ${money(totalCents)}, sent to ${email}.`;
+    ? `Order confirmed at full price, ${money(totalCents)}: you already used your first-order discount.`
+    : `Order confirmed with 20% off your first order: ${money(totalCents)} instead of ${money(subtotalCents)}.`;
 
   return {
     success: true,

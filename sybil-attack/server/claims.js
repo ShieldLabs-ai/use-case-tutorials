@@ -22,7 +22,7 @@ export async function claim({ walletAddress, requestId }) {
   if (existing) {
     return {
       success: false,
-      message: `Claim refused: this device already claimed the airdrop, with wallet ${truncate(existing.wallet_address)}.`,
+      message: `Claim refused: you already claimed the airdrop with wallet ${truncate(existing.wallet_address)}.`,
     };
   }
 

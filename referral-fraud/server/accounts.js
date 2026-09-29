@@ -34,7 +34,7 @@ export async function signUp({ email, referralCode, requestId }) {
   if (code && !referrer) {
     message = 'Account created. That referral code was not recognized.';
   } else if (referrer && referrer.device_id === deviceId) {
-    message = 'Account created. No referral reward: this device already referred itself (self-referral detected).';
+    message = 'Account created. No referral reward: you referred yourself.';
   } else if (referrer) {
     creditCents = REWARD_CENTS;
     creditAccount(referrer.email, REWARD_CENTS);

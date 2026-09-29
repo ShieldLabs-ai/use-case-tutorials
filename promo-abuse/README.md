@@ -42,7 +42,7 @@ See [Environments](https://docs.shieldlabs.ai/setup/environments) and [Domains](
 ## Try it
 
 1. Check out with the email `jordan@example.com`. You get 20% off.
-2. Clear the site's cookies, or open an incognito window, and check out again with a different email, `jordan2@example.com`. You are charged full price: the message says this device already used its first-order discount.
+2. Clear the site's cookies, or open an incognito window, and check out again with a different email, `jordan2@example.com`. You are charged full price: the message says you already used your first-order discount.
 
 ## Run the bot test
 

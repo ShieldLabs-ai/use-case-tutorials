@@ -42,8 +42,8 @@ See [Environments](https://docs.shieldlabs.ai/setup/environments) and [Domains](
 ## Try it
 
 1. Sign up with `riley@example.com`. Note the referral code shown, for example `RILEY482`.
-2. In the same browser, sign up a second account, `riley.alt@example.com`, using that referral code. The account is created, but the reward is refused: self-referral detected. The Device ID is the same as riley's.
-3. Open an incognito window, or a different browser, and sign up `casey@example.com` with the same code. This time both accounts earn $10: the Device ID is different.
+2. In the same browser, sign up a second account, `riley.alt@example.com`, using that referral code. The account is created, but the reward is refused: you referred yourself. The Device ID is the same as riley's.
+3. Open the app in a different browser, or on your phone, and sign up `casey@example.com` with the same code. This time both accounts earn $10: the Device ID is different. An incognito window on the same browser keeps the same Device ID, so it is refused like step 2.
 
 ## Run the bot test
 

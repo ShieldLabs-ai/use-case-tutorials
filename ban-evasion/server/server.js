@@ -30,7 +30,7 @@ app.post('/api/signin', async (request, reply) => {
 
 app.post('/api/signout', async (request, reply) => {
   signOut(sessionToken(request));
-  reply.clearCookie('session', { path: '/' });
+  reply.clearCookie('shieldlabs_demo_ban_evasion_session', { path: '/' });
   return reply.send({ success: true, message: 'Signed out.' });
 });
 
@@ -66,12 +66,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 // --- Helpers ---
 
 function sendWithSession(reply, { token, ...result }) {
-  if (token) reply.setCookie('session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
+  if (token) reply.setCookie('shieldlabs_demo_ban_evasion_session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
   return reply.send(result);
 }
 
 // Reads the session cookie without a cookie-parsing dependency.
 function sessionToken(request) {
-  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)session=([a-f0-9]+)/);
+  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shieldlabs_demo_ban_evasion_session=([a-f0-9]+)/);
   return match ? match[1] : null;
 }

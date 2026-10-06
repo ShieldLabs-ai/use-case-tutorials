@@ -48,10 +48,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
 // Recognizes a returning shopper by a cookie, or sets a new one.
 function shopperCookie(request, reply) {
-  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shopper=([a-f0-9]+)/);
+  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shieldlabs_demo_personalization_shopper=([a-f0-9]+)/);
   if (match) return match[1];
 
   const shopperId = randomBytes(16).toString('hex');
-  reply.setCookie('shopper', shopperId, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 365 * 24 * 60 * 60 });
+  reply.setCookie('shieldlabs_demo_personalization_shopper', shopperId, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 365 * 24 * 60 * 60 });
   return shopperId;
 }

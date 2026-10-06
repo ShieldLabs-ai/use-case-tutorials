@@ -20,3 +20,12 @@ test('reset starts this disposable tutorial over', async () => {
   assert.equal((await app.inject({ method: 'POST', url: '/api/reset-db' })).json().success, true);
   assert.equal((await app.inject({ method: 'POST', url: route, payload })).json().success, true);
 });
+
+test('the browser shopper cookie preserves searches across requests', async () => {
+  const first = await app.inject({url:'/api/profile'});
+  const cookie = first.cookies.map(item=>item.name+'='+item.value).join('; ');
+  assert.match(cookie,/shieldlabs_demo_personalization_shopper=/);
+  await app.inject({url:'/api/search?q=lamp',headers:{cookie}});
+  const profile = (await app.inject({url:'/api/profile',headers:{cookie}})).json();
+  assert.deepEqual(profile.recentSearches,['lamp']);
+});

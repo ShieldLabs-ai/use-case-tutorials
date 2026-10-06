@@ -16,7 +16,7 @@ app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.me
 app.post('/api/login', async (request, reply) => {
   const { email, password } = request.body ?? {};
   const { token, ...result } = await signIn({ email, password });
-  if (token) reply.setCookie('session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
+  if (token) reply.setCookie('shieldlabs_demo_account_takeover_session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
   return reply.send(result);
 });
 
@@ -27,7 +27,7 @@ app.get('/api/me', async (request, reply) => {
 
 app.post('/api/logout', async (request, reply) => {
   signOut(sessionToken(request));
-  reply.clearCookie('session', { path: '/' });
+  reply.clearCookie('shieldlabs_demo_account_takeover_session', { path: '/' });
   return reply.send({ success: true, message: 'Signed out.' });
 });
 
@@ -53,6 +53,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
 // Reads the session cookie without a cookie-parsing dependency.
 function sessionToken(request) {
-  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)session=([a-f0-9]+)/);
+  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shieldlabs_demo_account_takeover_session=([a-f0-9]+)/);
   return match ? match[1] : null;
 }

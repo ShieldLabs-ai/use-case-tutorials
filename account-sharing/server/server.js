@@ -17,7 +17,7 @@ app.post('/api/login', async (request, reply) => {
   const { email, password } = request.body ?? {};
   const result = await signIn({ email, password });
   if (result.success) {
-    reply.setCookie('session', result.token, { httpOnly: true, sameSite: 'lax', path: '/' });
+    reply.setCookie('shieldlabs_demo_account_sharing_session', result.token, { httpOnly: true, sameSite: 'lax', path: '/' });
   }
   return reply.send({ success: result.success, email: result.email, message: result.message });
 });
@@ -29,7 +29,7 @@ app.get('/api/session', async (request, reply) => {
 
 app.post('/api/logout', async (request, reply) => {
   signOut(sessionToken(request));
-  reply.clearCookie('session', { path: '/' });
+  reply.clearCookie('shieldlabs_demo_account_sharing_session', { path: '/' });
   return reply.send({ success: true, message: 'Signed out.' });
 });
 
@@ -55,6 +55,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
 // Reads the session cookie without a cookie-parsing dependency.
 function sessionToken(request) {
-  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)session=([a-f0-9]+)/);
+  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shieldlabs_demo_account_sharing_session=([a-f0-9]+)/);
   return match ? match[1] : null;
 }

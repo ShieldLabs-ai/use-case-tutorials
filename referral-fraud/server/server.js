@@ -17,7 +17,7 @@ app.post('/api/signup', async (request, reply) => {
   const { email, referralCode } = request.body ?? {};
   const result = await signUp({ email, referralCode });
   if (result.success) {
-    reply.setCookie('session', result.token, { httpOnly: true, sameSite: 'lax', path: '/' });
+    reply.setCookie('shieldlabs_demo_referral_fraud_session', result.token, { httpOnly: true, sameSite: 'lax', path: '/' });
   }
   return reply.send({
     success: result.success,
@@ -34,7 +34,7 @@ app.get('/api/me', async (request, reply) => {
 
 app.post('/api/logout', async (request, reply) => {
   endSession(sessionToken(request));
-  reply.clearCookie('session', { path: '/' });
+  reply.clearCookie('shieldlabs_demo_referral_fraud_session', { path: '/' });
   return reply.send({ success: true, message: 'Signed out.' });
 });
 
@@ -60,6 +60,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
 // Reads the session cookie without a cookie-parsing dependency.
 function sessionToken(request) {
-  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)session=([a-f0-9]+)/);
+  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shieldlabs_demo_referral_fraud_session=([a-f0-9]+)/);
   return match ? match[1] : null;
 }

@@ -29,6 +29,7 @@ export async function placeOrder({ eventId, quantity, email, cardNumber }) {
   const tickets = quantity === 1 ? '1 ticket' : `${quantity} tickets`;
   return {
     success: true,
+    orderId: Number(lastInsertRowid),
     message: `Order #${lastInsertRowid} confirmed: ${tickets} for ${event.name}, sent to ${email}.`,
   };
 }

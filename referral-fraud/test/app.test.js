@@ -118,7 +118,7 @@ test('the delayed reread determines risk, not the early low score', async () => 
   transform = (row, count) => ({ ...row, score: count === 1 ? 15 : 80 });
   const result = await act();
   assert.equal(result.body.success, false);
-  
+
   assert.equal(calls.length, 2);
 });
 test('a future timestamp on the second read is also refused', async () => {

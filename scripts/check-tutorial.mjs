@@ -98,4 +98,3 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     console.log(JSON.stringify(await checkTutorial(name)));
   }
 }
-

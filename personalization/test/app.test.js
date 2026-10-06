@@ -49,6 +49,18 @@ async function actAt(url, body = {}, options = {}, cookie) {
 }
 const act = (fields = {}, options = {}, cookie) => actAt(route, { ...payload, ...fields }, options, cookie);
 
+test('a History row belonging to another request cannot authorize an action', async () => {
+  transform = row => ({ ...row, request_id: randomUUID() });
+  assert.equal((await act()).body.success, false);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM used_request_ids').get().n, 0);
+});
+test('simultaneous uses of one request ID authorize at most one action', async () => {
+  const id = randomUUID();
+  const results = await Promise.all([act({}, { id }), act({}, { id })]);
+  assert.equal(results.filter(result => result.body.success).length, 1);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM used_request_ids WHERE request_id = ?').get(id).n, 1);
+});
+
 beforeEach(async () => { await app.inject({ method: 'POST', url: '/api/reset-db' }); calls = []; responseStatus = 200; transform = undefined; pausedFetch = undefined; markStarted = undefined; });
 after(async () => { await app.close(); db.close(); globalThis.fetch = originalFetch; });
 

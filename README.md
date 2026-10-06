@@ -54,13 +54,15 @@ Stop the starter server, switch to `final`, reinstall this app's dependencies an
 
 ## Verify and reset
 
+GitHub Actions checks every standalone folder on Node 22 and 24: folder independence, lockfile consistency, placeholder-only environment examples, JavaScript syntax, clean runtime installation, native tests and dependency audit. It uses no real account keys and does not run live scoring or the optional bot scripts. From the repository root, run `node scripts/check-tutorial.mjs` to check all folders or pass one folder name.
+
 Run `npm run check` and `npm test` in each folder. Automated tests use isolated SQLite and synthetic History responses, not live scoring. `DEMO_ALLOW_RESET=1` enables the disposable reset control and `npm run reset-db` clears that app's teaching state. A schema change when switching starter/final may recreate the demo database. Never put important data there.
 
 Live checks need your registered hostname and matching real History rows. Space identifications over a minute apart, avoid parallel checks and repeated cookie resets, and stop on rate limiting. Use only invented personal details and supplied sample cards. Deposits, purchases, reward credits, SMS, challenges and loan decisions are simulated.
 
 ## Production boundary
 
-The examples are not drop-in production security modules. Demonstration passwords, moderation/reset controls and admin evidence screens are intentionally for a disposable demo. A real application needs its own authentication, authorization, session/action binding, durable state and a shared atomic replay store. The example device limits are not ShieldLabs High-Risk Event thresholds. All changes in this work remain local; nothing here is a claim of deployment or publication.
+The examples are not drop-in production security modules. Demonstration passwords, moderation/reset controls and admin evidence screens are intentionally for a disposable demo. A real application needs its own authentication, authorization, session/action binding, durable state and a shared atomic replay store. The example device limits are not ShieldLabs High-Risk Event thresholds. Repository publication and green synthetic CI are not proof that every live scoring scenario has passed. Verify the completed app with your own registered hostname before adapting it.
 
 ## License
 

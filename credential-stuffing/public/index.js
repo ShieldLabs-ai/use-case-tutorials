@@ -52,6 +52,8 @@ function showCodeForm(challenge) {
     challengeId = challenge.challengeId;
     document.getElementById('demoCode').textContent = challenge.demoCode;
     codeForm.reset();
+    // Demo-only: the simulator returns this code openly; no real email is sent.
+    codeForm.elements.code.value = challenge.demoCode;
   }
   codeForm.classList.toggle('hidden', !challenge);
 }

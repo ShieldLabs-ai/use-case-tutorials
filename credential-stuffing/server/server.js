@@ -21,7 +21,7 @@ app.get('/vendor/shieldlabs.js', async (_request, reply) => reply.type('applicat
 // Expose only the Public Key to the browser. The Private API Key stays on the server.
 app.get('/config.js', async (_request, reply) => {
   reply.header('cache-control', 'no-store').type('application/javascript');
-  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')}; window.SHIELDLABS_CONFIGURED = ${Boolean(process.env.SHIELDLABS_PUBLIC_KEY && process.env.SHIELDLABS_API_KEY && process.env.SHIELDLABS_PUBLIC_KEY !== 'your-public-key' && process.env.SHIELDLABS_API_KEY !== 'sec_your_private_api_key')};`);
 });
 
 // Sign in.

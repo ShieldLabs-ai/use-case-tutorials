@@ -1,10 +1,19 @@
 // The pinned browser SDK is served locally by this app, not by a sibling folder.
 // Only request IDs go to the backend. No Private API Key or risk result is here.
+if (window.SHIELDLABS_CONFIGURED === false) {
+  const notice = document.createElement('aside');
+  notice.id = 'shieldlabs-setup-notice';
+  notice.setAttribute('role', 'note');
+  notice.style.cssText = 'padding:12px;margin:12px;border:1px solid #cc8c00;background:#fff6d8;color:#402d00';
+  notice.textContent = 'Final integration is not configured. Add this domain’s Public Key and Private API Key to your private .env, restart the server, then reload. Follow this app’s README. Never put the Private API Key in browser code.';
+  document.querySelector('main')?.prepend(notice);
+}
 let agentPromise;
 let queue = Promise.resolve();
 let signedInUserHid;
 
 function agent() {
+  if (window.SHIELDLABS_CONFIGURED === false) return Promise.reject(new Error('Demo keys are not configured'));
   if (!agentPromise) {
     agentPromise = Promise.resolve().then(() => window.ShieldLabsJS.load({ publicKey: window.SHIELDLABS_PUBLIC_KEY, timeout: 10_000 }));
     agentPromise.catch(() => { agentPromise = undefined; });

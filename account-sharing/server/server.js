@@ -23,7 +23,7 @@ app.get('/vendor/shieldlabs.js', async (_request, reply) => reply.type('applicat
 // Expose only the Public Key to the browser. The Private API Key stays on the server.
 app.get('/config.js', async (_request, reply) => {
   reply.header('cache-control', 'no-store').type('application/javascript');
-  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')}; window.SHIELDLABS_CONFIGURED = ${Boolean(process.env.SHIELDLABS_PUBLIC_KEY && process.env.SHIELDLABS_API_KEY && process.env.SHIELDLABS_PUBLIC_KEY !== 'your-public-key' && process.env.SHIELDLABS_API_KEY !== 'sec_your_private_api_key')};`);
 });
 
 // Sign in and store the session token in a cookie.
@@ -31,7 +31,7 @@ app.post('/api/login', async (request, reply) => {
   const { email, password, requestId, signOutOtherDevice } = request.body ?? {};
   const result = await signIn({ email, password, requestId, signOutOtherDevice: signOutOtherDevice === true });
   if (result.success) {
-    reply.setCookie('session', result.token, { httpOnly: true, sameSite: 'lax', path: '/' });
+    reply.setCookie('shieldlabs_demo_account_sharing_session', result.token, { httpOnly: true, sameSite: 'lax', path: '/' });
   }
   return reply.send({ success: result.success, otherDevice: result.otherDevice, message: result.message });
 });
@@ -43,7 +43,7 @@ app.get('/api/session', async (request, reply) => {
 
 app.post('/api/logout', async (request, reply) => {
   signOut(sessionToken(request));
-  reply.clearCookie('session', { path: '/' });
+  reply.clearCookie('shieldlabs_demo_account_sharing_session', { path: '/' });
   return reply.send({ success: true, message: 'Signed out.' });
 });
 
@@ -70,6 +70,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
 // Reads the session cookie without a cookie-parsing dependency.
 function sessionToken(request) {
-  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)session=([a-f0-9]+)/);
+  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shieldlabs_demo_account_sharing_session=([a-f0-9]+)/);
   return match ? match[1] : null;
 }

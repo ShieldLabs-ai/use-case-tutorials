@@ -13,7 +13,7 @@ app.register(fastifyStatic, { root: fileURLToPath(new URL('../public', import.me
 const require = createRequire(import.meta.url);
 const bundle = join(dirname(require.resolve('@shieldlabs-ai/js/package.json')), 'dist/shieldlabs.iife.js');
 app.get('/vendor/shieldlabs.js', async (_request, reply) => reply.type('application/javascript').send(await readFile(bundle)));
-app.get('/config.js', async (_request, reply) => reply.header('cache-control','no-store').type('application/javascript').send('window.SHIELDLABS_PUBLIC_KEY = '+JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')+';'));
+app.get('/config.js', async (_request, reply) => reply.header('cache-control','no-store').type('application/javascript').send('window.SHIELDLABS_PUBLIC_KEY = '+JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')+'; window.SHIELDLABS_CONFIGURED = '+Boolean(process.env.SHIELDLABS_PUBLIC_KEY && process.env.SHIELDLABS_API_KEY && process.env.SHIELDLABS_PUBLIC_KEY !== 'your-public-key' && process.env.SHIELDLABS_API_KEY !== 'sec_your_private_api_key')+';'));
 app.post('/api/checkout', async (request, reply) => {
   const { email, requestId } = request.body ?? {};
   if (typeof email !== 'string' || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { success: false, message: 'Enter a synthetic email.' };

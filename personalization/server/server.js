@@ -24,7 +24,7 @@ app.get('/vendor/shieldlabs.js', async (_request, reply) => reply.type('applicat
 // Expose only the Public Key to the browser. The Private API Key stays on the server.
 app.get('/config.js', async (_request, reply) => {
   reply.header('cache-control', 'no-store').type('application/javascript');
-  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')}; window.SHIELDLABS_CONFIGURED = ${Boolean(process.env.SHIELDLABS_PUBLIC_KEY && process.env.SHIELDLABS_API_KEY && process.env.SHIELDLABS_PUBLIC_KEY !== 'your-public-key' && process.env.SHIELDLABS_API_KEY !== 'sec_your_private_api_key')};`);
 });
 
 // Identify a browser that has no session yet. Its Device ID is the shopper.
@@ -32,7 +32,7 @@ app.post('/api/session', async (request, reply) => {
   const { token, deviceId, ...result } = await startDeviceSession(request.body?.requestId);
   if (!token) return reply.send(result);
 
-  reply.setCookie('device_session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
+  reply.setCookie('shieldlabs_demo_personalization_device', token, { httpOnly: true, sameSite: 'lax', path: '/' });
   const profile = getProfile(deviceId);
   const returning = profile.recentSearches.length > 0 || profile.saved.length > 0;
   return reply.send({ ...result, returning, profile: { identified: true, ...profile } });
@@ -79,6 +79,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
 // The shopper behind a request: the Device ID of the browser's session, or null.
 function shopperFor(request) {
-  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)device_session=([a-f0-9]+)/);
+  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shieldlabs_demo_personalization_device=([a-f0-9]+)/);
   return deviceForSession(match ? match[1] : null);
 }

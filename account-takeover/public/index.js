@@ -89,6 +89,8 @@ function showCodeForm(stepUp) {
     challengeId = stepUp.challengeId;
     document.getElementById('demoCode').textContent = stepUp.demoCode;
     codeForm.reset();
+    // Demo-only: the simulator returns this code openly; no real email is sent.
+    codeForm.elements.code.value = stepUp.demoCode;
   }
   codeForm.classList.toggle('hidden', !stepUp);
 }

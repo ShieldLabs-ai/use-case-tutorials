@@ -42,3 +42,10 @@ test('signed-in action uses its account HID without an extra background identifi
     assert.equal(await handle.take(), 'id'); assert.deepEqual(calls, [{ userId: 'opaque-account' }]);
   } finally { mod.restore(); }
 });
+
+test('unconfigured final does not call the scoring agent', async () => {
+  let attempts=0;
+  const mod=await browser({identify:async()=>{attempts++;return{requestId:'should-not-run'};}});
+  try { window.SHIELDLABS_CONFIGURED=false; assert.equal(await mod.identify(),null); assert.equal(attempts,0); }
+  finally { mod.restore(); }
+});

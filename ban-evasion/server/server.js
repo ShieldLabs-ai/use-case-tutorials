@@ -23,7 +23,7 @@ app.get('/vendor/shieldlabs.js', async (_request, reply) => reply.type('applicat
 // Expose only the Public Key to the browser. The Private API Key stays on the server.
 app.get('/config.js', async (_request, reply) => {
   reply.header('cache-control', 'no-store').type('application/javascript');
-  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')};`);
+  return reply.send(`window.SHIELDLABS_PUBLIC_KEY = ${JSON.stringify(process.env.SHIELDLABS_PUBLIC_KEY ?? '')}; window.SHIELDLABS_CONFIGURED = ${Boolean(process.env.SHIELDLABS_PUBLIC_KEY && process.env.SHIELDLABS_API_KEY && process.env.SHIELDLABS_PUBLIC_KEY !== 'your-public-key' && process.env.SHIELDLABS_API_KEY !== 'sec_your_private_api_key')};`);
 });
 
 // The board: posts, members and the signed-in member.
@@ -44,7 +44,7 @@ app.post('/api/signin', async (request, reply) => {
 
 app.post('/api/signout', async (request, reply) => {
   signOut(sessionToken(request));
-  reply.clearCookie('session', { path: '/' });
+  reply.clearCookie('shieldlabs_demo_ban_evasion_session', { path: '/' });
   return reply.send({ success: true, message: 'Signed out.' });
 });
 
@@ -81,12 +81,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 // --- Helpers ---
 
 function sendWithSession(reply, { token, ...result }) {
-  if (token) reply.setCookie('session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
+  if (token) reply.setCookie('shieldlabs_demo_ban_evasion_session', token, { httpOnly: true, sameSite: 'lax', path: '/' });
   return reply.send(result);
 }
 
 // Reads the session cookie without a cookie-parsing dependency.
 function sessionToken(request) {
-  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)session=([a-f0-9]+)/);
+  const match = (request.headers.cookie ?? '').match(/(?:^|;\s*)shieldlabs_demo_ban_evasion_session=([a-f0-9]+)/);
   return match ? match[1] : null;
 }

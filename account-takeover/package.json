@@ -7,21 +7,25 @@
   "type": "module",
   "main": "server/server.js",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "node --watch server/server.js",
     "start": "node server/server.js",
-    "reset-db": "node -e \"import('./server/db.js').then((db) => db.resetDb())\""
+    "reset-db": "node -e \"import('./server/db.js').then((db) => db.resetDb())\"",
+    "test": "node --test test/*.test.js",
+    "check": "node --check server/server.js && node --check public/index.js"
   },
   "dependencies": {
     "@fastify/cookie": "^11.1.2",
     "@fastify/static": "^10.1.5",
     "better-sqlite3": "^12.11.1",
     "dotenv": "^17.4.2",
-    "fastify": "^5.12.5"
+    "fastify": "^5.12.5",
+    "@shieldlabs-ai/js": "1.0.1",
+    "@shieldlabs-ai/node": "1.0.1"
   },
   "devDependencies": {
-    "puppeteer": "^24.43.1"
+    "puppeteer": "25.12.0"
   }
 }

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { hashPassword } from './passwords.js';
 
 // The demo data lives in db.sqlite, next to package.json.
-export const db = new Database(fileURLToPath(new URL('../db.sqlite', import.meta.url)));
+export const db = new Database(process.env.DEMO_DB_PATH || fileURLToPath(new URL('../db.sqlite', import.meta.url)));
 
 // Bump this when the tables change. A database with another version (for example
 // after you switch between the starter and final branches) is recreated.

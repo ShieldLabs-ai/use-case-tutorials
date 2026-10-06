@@ -1,65 +1,44 @@
-# ShieldLabs Account Takeover Tutorial
+# ShieldLabs Account takeover tutorial
 
-This tutorial shows how to stop account takeover with ShieldLabs: a correct password from a device the account has never used must pass a step-up check, and automated or Dangerous sign-ins are refused.
+This folder is a standalone application, on the **final** branch. Its `starter` version runs without ShieldLabs; its `final` version adds the pinned JS and Node SDKs and the following teaching rule: **A new device needs another factor**.
 
-See the full guide at [Account Takeover](https://docs.shieldlabs.ai/use-case/account-takeover).
+## Run this application
 
-This is the **final** branch: the demo app with the ShieldLabs integration. The **starter** branch has the same app without protection. See what the integration adds with `git diff starter final -- account-takeover`.
+Use Node.js 22 or later. From this folder:
 
-## Setup
+```sh
+npm ci --omit=dev
+cp .env.example .env
+npm run dev
+```
 
-1. Install the dependencies (Node.js 20 or later):
+The starter runs at http://127.0.0.1:3000 and needs no keys. The final needs a registered HTTPS hostname and the matching Public Key and Private API Key from **Integration > API keys**. Put them in `SHIELDLABS_PUBLIC_KEY` and `SHIELDLABS_API_KEY` in .env. The Private API Key stays on the server. Use your existing deployment/reverse proxy: no hosting provider is required. The service does not automatically accept a customer's key on localhost.
 
-   ```bash
-   npm install
-   ```
+## Compare starter and final
 
-2. Copy `.env.example` to `.env` and add your ShieldLabs keys from **Integration > API keys**: the Public Key as `SHIELDLABS_PUBLIC_KEY` and the Private API Key (`sec_...`) as `SHIELDLABS_API_KEY`.
-3. Start the server:
+Stop the server before switching versions. From the repository root run `git diff starter final -- account-takeover`, then switch branches and reinstall dependencies in this folder. Preserve your own uncommitted work in another clone rather than discarding it. Ignored .env files stay local; fill the final settings when moving from starter. Schema differences may recreate this app's disposable database.
 
-   ```bash
-   npm run dev
-   ```
-
-4. Open the app on your development domain (see below).
-
-## Run it on your domain
-
-The ShieldLabs snippet only runs on a domain you added and verified in your ShieldLabs account: the Public Key is bound to that domain, so `localhost` and raw IP addresses are rejected. The starter branch runs on localhost as is. This branch needs your domain:
-
-1. In the [dashboard](https://app.shieldlabs.ai/), register a development domain such as `tutorial.your-domain.com` as its own domain under **Integration > Domains**, rather than reusing your production keys. No account yet? [Start Free](https://app.shieldlabs.ai/): 5,000 identifications one time, no credit card.
-2. Copy that domain's keys into `.env` (see Setup).
-3. Tunnel the domain to `localhost:3000`, for example with Cloudflare Tunnel, and open `https://tutorial.your-domain.com`. The [root README](../README.md#the-domain-requirement) has the commands.
-
-See [Environments](https://docs.shieldlabs.ai/setup/environments) and [Domains](https://docs.shieldlabs.ai/setup/domains) for the details.
-
-## How it works
-
-- `public/shieldlabs.js` loads the ShieldLabs snippet and runs `forceCheckAnonymous` when the user starts filling in the sign-in form. The request ID of that identification goes to the server with the credentials.
-- `server/shieldlabs.js` reads the identification from the History API. The sign-in is refused when the identification is missing, unverified, rate limited, older than 5 minutes or already used, when it shows browser automation or disabled JavaScript, or when its Risk Score is in the Dangerous band (60-100).
-- `server/accounts.js` keeps the known devices of each account, keyed by Device ID. A known device signs in with the password. A correct password from an unknown device gets a one-time code by email first (simulated: the code is shown on the page), and the device becomes known once the code is entered. In the demo, the first device an account ever signs in from becomes its first known device.
-- The signed-in page calls `checkAuthenticatedUser` with a hashed account id, which ties the visit to the account for the High-Risk Events ShieldLabs detects on users, such as Account takeover.
+In final, `public/shieldlabs.js` uses `@shieldlabs-ai/js@1.0.1` and sends a fresh action request ID. `server/shieldlabs.js` retrieves History with `@shieldlabs-ai/node@1.0.1`, rejects missing, stale, reused, limited and unusable results and applies the configured risk guard. It rereads after an 11-second observation delay as a demo precaution, not a server-guaranteed finality marker. The other modules in `server/` implement this app's rule and its own SQLite state. No sibling folder or root shared server is required.
 
 ## Try it
 
-1. Sign in with the demo account `demo@example.com` / `demo-password`. This is the account owner, and this browser becomes the first known device.
-2. Sign out, then sign in from a different browser with the same password, as someone with a leaked password would. The app asks for a one-time code instead of letting them in.
-3. Enter the code shown on the page. The new device is added to **Known devices**, and later sign-ins from it need only the password.
+Sign in with demo@example.com / demo-password. From another observed device, enter the demo code shown on the page to finish the challenge. No email is sent.
 
-## Run the bot test
+Only use invented information and provided demo credentials/sample cards. Payments, orders, challenges, messages and rewards are simulated. This exercise is not a real loan decision or a transfer of funds. Keep live identifications over a minute apart and stop on rate limiting. Compare actual History Device IDs before interpreting private-window or changed-cookie behavior.
 
-With the server and the tunnel running, sign in from headless Chrome:
+## Verify
 
-```bash
-BASE_URL=https://tutorial.your-domain.com node test-bot.js
+```sh
+npm run check
+npm test
 ```
 
-The sign-in is refused: headless Chrome raises the Browser Automation signal.
+Tests use an isolated database and synthetic History responses; they do not call real scoring. The final suite covers this scenario, real SDK normalization, replay/freshness/automation guards, unavailable History, late updates and reset during a pending read. These tests do not substitute for a live check with the registered hostname.
 
-## Reset the demo database
+The optional `test-bot.js` needs dev dependencies: install with `npm ci`. Run it only in a controlled browser-test environment. This branch's ordinary app and native tests work with `npm ci --omit=dev`.
 
-Click **Reset demo DB** at the bottom of the page, or run:
+## Reset and production boundary
 
-```bash
-npm run reset-db
-```
+`DEMO_ALLOW_RESET=1` enables **Reset demo DB**; `npm run reset-db` clears this folder's teaching state. Do not keep important information in db.sqlite. Demonstration accounts, reset/moderator tools and admin screens are not production authorization. Add your own authentication, session/action binding, durable state and shared replay storage before adapting the app. The teaching thresholds are not ShieldLabs High-Risk Event thresholds.
+
+Guide: [Account takeover](https://docs.shieldlabs.ai/tutorials/new-login-device) (the new guide stays local until its separate documentation release).

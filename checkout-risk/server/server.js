@@ -12,7 +12,7 @@ app.post('/api/checkout', async (request, reply) => {
   const { email, requestId } = request.body ?? {};
   if (typeof email !== 'string' || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { success: false, message: 'Enter a synthetic email.' };
   let outcome = 'accepted';
-  
+
   const { lastInsertRowid } = db.prepare('INSERT INTO orders (email,outcome) VALUES (?,?)').run(email,outcome);
   return { success: true, outcome, orderId: Number(lastInsertRowid), message: outcome==='review'?'Synthetic order held for review; no payment taken.':'Synthetic order recorded; no payment taken.' };
 });

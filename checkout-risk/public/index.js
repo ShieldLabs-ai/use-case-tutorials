@@ -4,7 +4,7 @@ const output = document.querySelector('#result');
 form.addEventListener('submit', async event => {
   event.preventDefault(); const button=form.querySelector('button'); button.disabled=true;
   try {
-    
+
     const response = await fetch('/api/checkout',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:form.elements.email.value})});
     const data=await response.json(); output.textContent=data.message;
   } catch { output.textContent='The demo could not complete this action.'; } finally { button.disabled=false; }

@@ -7,7 +7,7 @@ Twenty independent reference applications for visitor identification and abuse p
 - `starter`: the app before integrating ShieldLabs. It works locally without keys.
 - `final`: the same app with pinned browser and Node SDKs and a server-side decision.
 
-Compare the integration with `git diff starter final -- new-account-fraud`. Stop the server before switching versions and run `npm ci --omit=dev` again in the chosen app. Do not discard your own local changes just to switch branches; use another clone if necessary. The tutorials remain private until a separate release decision.
+Compare the integration with `git diff starter final -- new-account-fraud`. Stop the server before switching versions and run `npm ci --omit=dev` again in the chosen app. Do not discard your own local changes just to switch branches; use another clone if necessary. The public default branch is `starter`; switch to `final` for the completed ShieldLabs integration.
 
 ## Applications
 

@@ -10,7 +10,7 @@ const result = document.getElementById('result');
 
 // Identify the signup and the deposit when the user starts filling in each form.
 const signupIdentification = identifyOnFirstFocus(signupForm);
-const depositIdentification = identifyOnFirstFocus(depositForm);
+const depositIdentification = identifyOnFirstFocus(depositForm, { signedIn: true });
 
 // Show the view that matches this browser's session.
 await refreshAccount();

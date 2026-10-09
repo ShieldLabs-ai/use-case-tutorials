@@ -20,7 +20,7 @@ const SUBTOTAL = CART.reduce((sum, item) => sum + item.price, 0);
 // that is fine, because it is not what decides the discount. The checkout
 // call below re-checks eligibility against the ShieldLabs Device ID, which
 // holds through cleared cookies, incognito windows and new IP addresses.
-const HINT_COOKIE = 'acme_ordered_before';
+const HINT_COOKIE = 'shieldlabs_demo_promo_ordered_before';
 
 export function getCart(request) {
   return { items: CART, subtotal: SUBTOTAL, firstOrderEligible: !hasOrderedBeforeHint(request) };

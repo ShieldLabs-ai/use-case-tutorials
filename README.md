@@ -1,113 +1,69 @@
 # ShieldLabs use case tutorials
 
-This repository contains runnable tutorials that show how to use [ShieldLabs](https://shieldlabs.ai) to detect and stop common fraud and abuse: fake signups, account takeover, coupon and paywall abuse, card testing, SMS pumping, scraping and more.
+Twenty independent reference applications for visitor identification and abuse prevention. Every folder contains its own browser page, Fastify server, SQLite database, dependencies and tests. Copy one folder to use it; no other scenario or shared decision-lab server is required.
 
-ShieldLabs is a fraud detection and prevention API. A JavaScript snippet identifies each visit in the browser, and your backend reads the result of that identification: the Device ID, the Visitor ID, a Risk Score from 0 to 100 and the named risk signals behind it.
+## Two versions
 
-Each tutorial is a self-contained demo application with a **starter** branch (the app without protection) and a **final** branch (the completed ShieldLabs integration). The difference between the two branches is exactly what the integration adds:
+- `starter`: the app before integrating ShieldLabs. It works locally without keys.
+- `final`: the same app with pinned browser and Node SDKs and a server-side decision.
 
-```bash
-git diff starter final -- new-account-fraud
+Compare the integration with `git diff starter final -- new-account-fraud`. Stop the server before switching versions and run `npm ci --omit=dev` again in the chosen app. Do not discard your own local changes just to switch branches; use another clone if necessary. The public default branch is `starter`; switch to `final` for the completed ShieldLabs integration.
+
+## Applications
+
+- [New account fraud](./new-account-fraud/README.md): One trial per Device ID.
+- [Checkout review](./checkout-risk/README.md): Dangerous orders go to review.
+- [Paywall enforcement](./paywall/README.md): Two distinct free articles per device per day.
+- [Account sharing](./account-sharing/README.md): One active device per demo account.
+- [Account takeover](./account-takeover/README.md): A new device needs another factor.
+- [Ban evasion](./ban-evasion/README.md): A new account does not bypass a device ban.
+- [Welcome bonus](./bonus-abuse/README.md): One welcome match per device.
+- [Card testing](./card-testing/README.md): Declined attempts are counted per device.
+- [Chargeback evidence](./chargeback-dispute/README.md): Store the verified device behind an order.
+- [Coupon abuse](./coupon-abuse/README.md): One use of a code per device, with a code cooldown.
+- [Credential stuffing](./credential-stuffing/README.md): Failed passwords are counted per device.
+- [Loan application review](./loan-risk/README.md): Conflicting same-device applications need review.
+- [Returning visitor personalization](./personalization/README.md): Preferences follow a verified device rather than only its session cookie.
+- [First-order promotion](./promo-abuse/README.md): One first-order discount per device.
+- [Referral fraud](./referral-fraud/README.md): Same-device referrals earn no reward.
+- [Regional pricing](./regional-pricing/README.md): A regional price needs a matching unmasked connection.
+- [SMS pumping](./sms-pumping/README.md): Three synthetic sends per device per day, with growing waits.
+- [Survey fraud](./survey-fraud/README.md): One reward-bearing survey per device.
+- [Sybil claims](./sybil-attack/README.md): One simulated airdrop claim per device.
+- [Web scraping](./web-scraping/README.md): Unverified or automated searches receive no flight prices.
+
+## Run one app
+
+Use Node.js 22 or later. From the repository root:
+
+```sh
+git switch starter
+cd new-account-fraud
+npm ci --omit=dev
+cp .env.example .env
+npm run dev
 ```
 
-## Tutorials
+Open http://127.0.0.1:3000. Replace the folder name to choose another app. To use the optional headless bot script, install dev dependencies with `npm ci`.
 
-- [**Account sharing prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/account-sharing): keep one device signed in per account and let the owner sign the other device out.
-- [**Account takeover prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/account-takeover): step up a sign-in that brings the right password from a device the account has never used.
-- [**Ban evasion prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/ban-evasion): ban every device a banned user signed in from, so a fresh account does not get them back in.
-- [**Bonus abuse prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/bonus-abuse): pay a welcome deposit-match bonus once per device, no matter how many accounts try to claim it.
-- [**Card testing prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/card-testing): cap declined card attempts per device and refuse automated checkouts.
-- [**Chargeback dispute evidence**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/chargeback-dispute): store the device behind every order and assemble evidence against friendly-fraud chargebacks.
-- [**Coupon abuse prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/coupon-abuse): allow one redemption per code per device, with a cooldown before a second code.
-- [**Promo abuse prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/promo-abuse): apply an automatic first-order discount once per device, not once per email address.
-- [**Referral fraud prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/referral-fraud): pay a referral reward only when the referrer and the new signup are on different devices.
-- [**Credential stuffing prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/credential-stuffing): limit failed sign-ins per device, refuse automation and challenge sign-ins from unknown devices.
-- [**Loan application fraud prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/loan-risk): flag applications whose name or income changes between attempts from the same device.
-- [**New account fraud prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/new-account-fraud): allow one free trial per device and refuse automated or Dangerous signups.
-- [**Paywall enforcement**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/paywall): meter free articles per device, so incognito windows and cleared cookies do not reset the count.
-- [**Returning visitor personalization**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/personalization): keep search history and saved items for a returning device, even in incognito or after cookies are cleared.
-- [**Regional pricing enforcement**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/regional-pricing): apply a regional discount only for the country of an unmasked connection.
-- [**SMS pumping prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/sms-pumping): cap verification codes per device with a growing wait, and refuse automation and Tor.
-- [**Sybil attack prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/sybil-attack): accept one airdrop claim per device, no matter how many wallet addresses try.
-- [**Survey fraud prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/survey-fraud): accept one paid survey submission per device.
-- [**Web scraping prevention**](https://github.com/ShieldLabs-ai/use-case-tutorials/tree/starter/web-scraping): serve flight prices to real browsers and refuse automated requests.
+## Run final
 
-## General setup
+Stop the starter server, switch to `final`, reinstall this app's dependencies and copy the final .env.example settings into .env. Use the Public Key and Private API Key for a hostname registered in **Integration > Domains**, copied from **Integration > API keys**. Serve the app through HTTPS on that hostname via your existing deployment or reverse proxy. The API does not automatically accept a customer's key on localhost. No particular hosting provider is required.
 
-You need Node.js 20 or later.
+`public/shieldlabs.js` uses `@shieldlabs-ai/js@1.0.1` and sends a fresh request ID for an action. `server/shieldlabs.js` uses `@shieldlabs-ai/node@1.0.1` to read History and evaluate the identification. It rereads at least 11 seconds after the observation as a demo precaution, not a guaranteed finality marker. Failed, stale and reused checks do not authorize actions. Most examples refuse Dangerous traffic; checkout-risk sends a verified Dangerous order for review. Automation is refused in both. Read the code of the selected scenario for its own limits.
 
-1. Clone this repo and, **within the folder of the use case you want to try**, install the dependencies:
+## Verify and reset
 
-   ```bash
-   npm install
-   ```
+GitHub Actions checks every standalone folder on Node 22 and 24: folder independence, lockfile consistency, placeholder-only environment examples, JavaScript syntax, clean runtime installation, native tests and dependency audit. It uses no real account keys and does not run live scoring or the optional bot scripts. From the repository root, run `node scripts/check-tutorial.mjs` to check all folders or pass one folder name.
 
-   This also downloads a Chrome build for the Puppeteer bot test.
+Run `npm run check` and `npm test` in each folder. Automated tests use isolated SQLite and synthetic History responses, not live scoring. `DEMO_ALLOW_RESET=1` enables the disposable reset control and `npm run reset-db` clears that app's teaching state. A schema change when switching starter/final may recreate the demo database. Never put important data there.
 
-2. Copy `.env.example` to `.env`. On the final branch, add your ShieldLabs keys (see below).
+Live checks need your registered hostname and matching real History rows. Space identifications over a minute apart, avoid parallel checks and repeated cookie resets, and stop on rate limiting. Use only invented personal details and supplied sample cards. Deposits, purchases, reward credits, SMS, challenges and loan decisions are simulated.
 
-3. Start the server:
+## Production boundary
 
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) for the starter branch, or your development domain for the final branch.
-
-## The domain requirement
-
-The ShieldLabs snippet only runs on a domain you added and verified in your ShieldLabs account. The Public Key is bound to that domain, so pages served from `localhost` or a raw IP address are rejected. The starter branch runs on [http://localhost:3000](http://localhost:3000) as is. To run the final branch:
-
-1. [Start Free](https://app.shieldlabs.ai/) (5,000 identifications one time, no credit card) or sign in to the dashboard.
-2. Register a development domain, for example `tutorial.your-domain.com`, as its own domain under **Integration > Domains**, rather than reusing the keys of your production domain. The hostname must resolve in public DNS. The first identification from the domain verifies it. If you serve the app on a subdomain of the domain you registered, keep its subdomains **Accepted** (the default). On the Free and Starter plans your account holds one domain, so the development domain takes that slot. See [Environments](https://docs.shieldlabs.ai/setup/environments) and [Domains](https://docs.shieldlabs.ai/setup/domains).
-3. Open **Integration > API keys** for that domain and copy its keys into `.env`: the **Public Key** as `SHIELDLABS_PUBLIC_KEY` (it goes to the browser) and the **Private API Key** (`sec_...`) as `SHIELDLABS_API_KEY` (it stays on the server).
-4. Tunnel the domain to your local server. With [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/), for a domain whose DNS is on Cloudflare:
-
-   ```bash
-   cloudflared tunnel login
-   cloudflared tunnel create shieldlabs-tutorial
-   cloudflared tunnel route dns shieldlabs-tutorial tutorial.your-domain.com
-   cloudflared tunnel run --url http://localhost:3000 shieldlabs-tutorial
-   ```
-
-   Any tunnel or reverse proxy that serves the app on your registered hostname works.
-
-5. Run `npm run dev` and open `https://tutorial.your-domain.com`.
-
-## How the final apps use ShieldLabs
-
-- **In the browser**, `public/shieldlabs.js` loads the snippet from `cdn.shieldlabs.ai` with the Public Key served by `/config.js`. When the user starts an action (the first focus of the form), it runs `forceCheckAnonymous` and waits for the request ID of that identification, which the page sends to the server with the form. The browser never sees a Risk Score.
-- **On the server**, `server/shieldlabs.js` reads the identification from the [History API](https://docs.shieldlabs.ai/api/server-api) with the Private API Key. Scoring is asynchronous, so it polls every half second for up to about 10 seconds.
-- **Every protected handler starts with the same guard**: no identification is refused as unverified (never treated as clean), the 999 rate-limit marker and the all-zero Device ID are refused, an identification older than 5 minutes or already used for another action is refused, and browser automation, disabled JavaScript or a Risk Score in the Dangerous band is refused. Risk Score bands: **Trusted** 0-29, **Suspicious** 30-59, **Dangerous** 60-100.
-- **The use case rule keys on the Device ID**, which holds through cleared cookies, incognito windows and IP changes. The Visitor ID changes when cookies are cleared, so the tutorials do not key on it.
-
-The refusal messages in the demos name the reason to make the tutorials easy to follow. In production, show a generic message and log the reason.
-
-## Run the bot test
-
-Each app has a `test-bot.js` Puppeteer script that runs the main flow in headless Chrome and prints the server's answer. On the starter branch the bot gets through:
-
-```bash
-node test-bot.js
-```
-
-On the final branch, point it at your development domain. Headless Chrome raises the Browser Automation signal, so the server refuses the action:
-
-```bash
-BASE_URL=https://tutorial.your-domain.com node test-bot.js
-```
-
-## Resetting the demo databases
-
-Each app keeps its data in a local SQLite file, `db.sqlite`. To reset it:
-
-- Click **Reset demo DB** at the bottom of the demo app page, or
-- Run this from the app folder:
-
-  ```bash
-  npm run reset-db
-  ```
+The examples are not drop-in production security modules. Demonstration passwords, moderation/reset controls and admin evidence screens are intentionally for a disposable demo. A real application needs its own authentication, authorization, session/action binding, durable state and a shared atomic replay store. The example device limits are not ShieldLabs High-Risk Event thresholds. Repository publication and green synthetic CI are not proof that every live scoring scenario has passed. Verify the completed app with your own registered hostname before adapting it.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](./LICENSE)

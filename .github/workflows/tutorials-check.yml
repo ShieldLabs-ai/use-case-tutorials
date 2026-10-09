@@ -1,0 +1,73 @@
+name: Standalone tutorial checks
+
+on:
+  pull_request:
+    branches: [starter, final]
+  push:
+    branches: [starter, final]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tutorials-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tutorials:
+    name: ${{ matrix.app }} / Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        node: ['22', '24']
+        app:
+          - account-sharing
+          - account-takeover
+          - ban-evasion
+          - bonus-abuse
+          - card-testing
+          - chargeback-dispute
+          - checkout-risk
+          - coupon-abuse
+          - credential-stuffing
+          - loan-risk
+          - new-account-fraud
+          - paywall
+          - personalization
+          - promo-abuse
+          - referral-fraud
+          - regional-pricing
+          - sms-pumping
+          - survey-fraud
+          - sybil-attack
+          - web-scraping
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+      DOTENV_CONFIG_PATH: /tmp/shieldlabs-tutorial-ci-no-env
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+      - name: Check folder independence, lockfile, placeholders and syntax
+        run: node scripts/check-tutorial.mjs "${{ matrix.app }}"
+      - name: Install the ordinary user's dependencies
+        working-directory: ${{ matrix.app }}
+        run: npm ci --omit=dev
+      - name: Check the app
+        working-directory: ${{ matrix.app }}
+        run: npm run check
+      - name: Native tests with synthetic History only
+        working-directory: ${{ matrix.app }}
+        run: npm test
+      - name: Audit runtime dependencies
+        working-directory: ${{ matrix.app }}
+        run: npm audit --omit=dev --audit-level=high

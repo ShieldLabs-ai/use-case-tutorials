@@ -1,61 +1,44 @@
-# ShieldLabs Loan Application Fraud Tutorial
+# ShieldLabs Loan application review tutorial
 
-This tutorial shows how to catch loan application fraud with ShieldLabs: when the same device resubmits an application with a different name or income, the application is flagged for review instead of getting an instant offer.
+This folder is a standalone application, on the **final** branch. Its `starter` version runs without ShieldLabs; its `final` version adds the pinned JS and Node SDKs and the following teaching rule: **Conflicting same-device applications need review**.
 
-This is the **final** branch: the demo app with the ShieldLabs integration. The **starter** branch has the same app without protection. See what the integration adds with `git diff starter final -- loan-risk`.
+## Run this application
 
-## Setup
+Use Node.js 22 or later. From this folder:
 
-1. Install the dependencies (Node.js 20 or later):
+```sh
+npm ci --omit=dev
+cp .env.example .env
+npm run dev
+```
 
-   ```bash
-   npm install
-   ```
+The starter runs at http://127.0.0.1:3000 and needs no keys. The final needs a registered HTTPS hostname and the matching Public Key and Private API Key from **Integration > API keys**. Put them in `SHIELDLABS_PUBLIC_KEY` and `SHIELDLABS_API_KEY` in .env. The Private API Key stays on the server. Use your existing deployment/reverse proxy: no hosting provider is required. The service does not automatically accept a customer's key on localhost.
 
-2. Copy `.env.example` to `.env` and add your ShieldLabs keys from **Integration > API keys**: the Public Key as `SHIELDLABS_PUBLIC_KEY` and the Private API Key (`sec_...`) as `SHIELDLABS_API_KEY`.
-3. Start the server:
+## Compare starter and final
 
-   ```bash
-   npm run dev
-   ```
+Stop the server before switching versions. From the repository root run `git diff starter final -- loan-risk`, then switch branches and reinstall dependencies in this folder. Preserve your own uncommitted work in another clone rather than discarding it. Ignored .env files stay local; fill the final settings when moving from starter. Schema differences may recreate this app's disposable database.
 
-4. Open the app on your development domain (see below).
-
-## Run it on your domain
-
-The ShieldLabs snippet only runs on a domain you added and verified in your ShieldLabs account: the Public Key is bound to that domain, so `localhost` and raw IP addresses are rejected. The starter branch runs on localhost as is. This branch needs your domain:
-
-1. In the [dashboard](https://app.shieldlabs.ai/), register a development domain such as `tutorial.your-domain.com` as its own domain under **Integration > Domains**, rather than reusing your production keys. No account yet? [Start Free](https://app.shieldlabs.ai/): 5,000 identifications one time, no credit card.
-2. Copy that domain's keys into `.env` (see Setup).
-3. Tunnel the domain to `localhost:3000`, for example with Cloudflare Tunnel, and open `https://tutorial.your-domain.com`. The [root README](../README.md#the-domain-requirement) has the commands.
-
-See [Environments](https://docs.shieldlabs.ai/setup/environments) and [Domains](https://docs.shieldlabs.ai/setup/domains) for the details.
-
-## How it works
-
-- `public/shieldlabs.js` loads the ShieldLabs snippet and runs `forceCheckAnonymous` when the applicant starts filling in the form. The request ID of that identification goes to the server with the application.
-- `server/shieldlabs.js` reads the identification from the History API. The application is refused when the identification is missing, unverified, rate limited, older than 5 minutes or already used, when it shows browser automation or disabled JavaScript, or when its Risk Score is in the Dangerous band (60-100).
-- `server/loans.js` stores the Device ID with every application and compares each new application with the ones from the same device in the last 24 hours. A different name or income is flagged for manual review and no offer is calculated, even when the applicant clears cookies or switches to an incognito window.
+In final, `public/shieldlabs.js` uses `@shieldlabs-ai/js@1.0.1` and sends a fresh action request ID. `server/shieldlabs.js` retrieves History with `@shieldlabs-ai/node@1.0.1`, rejects missing, stale, reused, limited and unusable results and applies the configured risk guard. It rereads after an 11-second observation delay as a demo precaution, not a server-guaranteed finality marker. The other modules in `server/` implement this app's rule and its own SQLite state. No sibling folder or root shared server is required.
 
 ## Try it
 
-1. Apply as Alex Morgan with a monthly income of 2,000 for a 20,000 loan over 12 months. The application is declined: the payment is too high for that income.
-2. Apply again with the same details and a monthly income of 9,000. The application is flagged for manual review, with no offer: this device applied a moment ago with a different income.
+Submit made-up applicant details, then change the name or income on the same device. The changed application is flagged for review. No real lending decision is made.
 
-## Run the bot test
+Only use invented information and provided demo credentials/sample cards. Payments, orders, challenges, messages and rewards are simulated. This exercise is not a real loan decision or a transfer of funds. Keep live identifications over a minute apart and stop on rate limiting. Compare actual History Device IDs before interpreting private-window or changed-cookie behavior.
 
-With the server and the tunnel running, apply from headless Chrome:
+## Verify
 
-```bash
-BASE_URL=https://tutorial.your-domain.com node test-bot.js
+```sh
+npm run check
+npm test
 ```
 
-The application is refused: headless Chrome raises the Browser Automation signal.
+Tests use an isolated database and synthetic History responses; they do not call real scoring. The final suite covers this scenario, real SDK normalization, replay/freshness/automation guards, unavailable History, late updates and reset during a pending read. These tests do not substitute for a live check with the registered hostname.
 
-## Reset the demo database
+The optional `test-bot.js` needs dev dependencies: install with `npm ci`. Run it only in a controlled browser-test environment. This branch's ordinary app and native tests work with `npm ci --omit=dev`.
 
-Click **Reset demo DB** at the bottom of the page, or run:
+## Reset and production boundary
 
-```bash
-npm run reset-db
-```
+`DEMO_ALLOW_RESET=1` enables **Reset demo DB**; `npm run reset-db` clears this folder's teaching state. Do not keep important information in db.sqlite. Demonstration accounts, reset/moderator tools and admin screens are not production authorization. Add your own authentication, session/action binding, durable state and shared replay storage before adapting the app. The teaching thresholds are not ShieldLabs High-Risk Event thresholds.
+
+Guide: [Loan application review](https://docs.shieldlabs.ai/tutorials/loan-application-review) (the new guide stays local until its separate documentation release).

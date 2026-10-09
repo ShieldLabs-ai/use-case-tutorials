@@ -45,7 +45,7 @@ export async function deposit(token, { amountCents, requestId }) {
 
   // Read the identification behind this deposit. Unverified, automated and
   // Dangerous deposits are refused.
-  const check = await verifyIdentification(requestId);
+  const check = await verifyIdentification(requestId, { expectedUserHid: hashUserId(account.email) });
   if (!check.ok) {
     return { success: false, message: `Deposit refused: ${check.message}` };
   }

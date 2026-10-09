@@ -33,6 +33,7 @@ export async function activateRegionalPrice({ country, requestId }) {
     flags.tor ||
     flags.privacy_relay ||
     flags.datacenter_ip ||
+    flags.browser_vpn_proxy ||
     connectionType === 'browser_vpn_proxy';
   if (masked) {
     return { success: false, message: 'Regional pricing is not available over a VPN, a proxy or Tor. Turn it off and try again.' };

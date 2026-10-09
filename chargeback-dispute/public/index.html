@@ -8,6 +8,7 @@
   </head>
   <body class="min-h-screen bg-slate-50 text-slate-900">
     <main class="mx-auto max-w-xl px-4 py-12">
+      <p class="mb-4 rounded border border-slate-200 bg-white p-3 text-sm">ShieldLabs tutorial: simulated actions only. Do not enter real passwords, payment details or personal information.</p>
       <div class="flex items-baseline justify-between">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Tickets</p>
         <a href="/admin.html" class="text-sm underline">Admin: orders and chargebacks</a>
@@ -32,7 +33,7 @@
         </label>
         <label class="block">
           <span class="text-sm font-medium">Email for the tickets</span>
-          <input id="email" name="email" type="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+          <input id="email" name="email" type="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" value="tutorial@example.test" />
         </label>
         <label class="block">
           <span class="text-sm font-medium">Card number</span>
@@ -43,8 +44,7 @@
             autocomplete="cc-number"
             placeholder="4242 4242 4242 4242"
             required
-            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
-          />
+            class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" value="4242424242424242" />
         </label>
         <button
           id="buyBtn"
@@ -64,6 +64,7 @@
     </main>
 
     <script src="/config.js"></script>
+    <script src="/vendor/shieldlabs.js"></script>
     <script type="module" src="/index.js"></script>
   </body>
 </html>

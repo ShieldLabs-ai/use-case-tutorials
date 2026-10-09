@@ -8,6 +8,7 @@
   </head>
   <body class="min-h-screen bg-slate-50 text-slate-900">
     <main class="mx-auto max-w-4xl px-4 py-12">
+      <p class="mb-4 rounded border border-slate-200 bg-white p-3 text-sm">ShieldLabs tutorial: simulated actions only. Do not enter real passwords, payment details or personal information.</p>
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Forum</p>
       <h1 class="mt-1 text-2xl font-semibold">Neighborhood board</h1>
 
@@ -40,8 +41,7 @@
                 placeholder="Username"
                 autocomplete="username"
                 required
-                class="w-full rounded-md border border-slate-300 px-3 py-2"
-              />
+                class="w-full rounded-md border border-slate-300 px-3 py-2" value="tutorial_one" />
               <input
                 id="password"
                 name="password"
@@ -49,8 +49,7 @@
                 placeholder="Password"
                 autocomplete="current-password"
                 required
-                class="w-full rounded-md border border-slate-300 px-3 py-2"
-              />
+                class="w-full rounded-md border border-slate-300 px-3 py-2" value="synthetic-password" />
               <div class="flex gap-2">
                 <button
                   id="signupBtn"
@@ -94,6 +93,7 @@
     </main>
 
     <script src="/config.js"></script>
+    <script src="/vendor/shieldlabs.js"></script>
     <script type="module" src="/index.js"></script>
   </body>
 </html>

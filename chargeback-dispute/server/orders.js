@@ -54,6 +54,7 @@ export async function placeOrder({ eventId, quantity, email, cardNumber, request
   const tickets = quantity === 1 ? '1 ticket' : `${quantity} tickets`;
   return {
     success: true,
+    orderId: Number(lastInsertRowid),
     message: `Order #${lastInsertRowid} confirmed: ${tickets} for ${event.name}, sent to ${email}.`,
   };
 }
@@ -92,10 +93,10 @@ export async function getEvidence(orderId) {
   // sign that the cardholder placed the disputed order too.
   const sameDevice = db
     .prepare(
-      `SELECT * FROM orders WHERE device_id = ? AND id != ? AND created_at < ? AND chargeback_at IS NULL
-       ORDER BY created_at DESC`,
+      `SELECT * FROM orders WHERE device_id = ? AND id < ? AND chargeback_at IS NULL
+       ORDER BY created_at DESC, id DESC`,
     )
-    .all(order.device_id, order.id, order.created_at);
+    .all(order.device_id, order.id);
 
   return {
     success: true,
@@ -114,13 +115,13 @@ function findOrder(id) {
 async function summarizeDevice(deviceId) {
   try {
     const rows = await readHistory('device_id', deviceId, 100);
-    const times = rows.map((row) => row.created_at).sort();
+    const times = rows.map((row) => row.observed_at).sort();
     return {
       identifications: rows.length,
       firstSeen: times[0] ?? null,
       lastSeen: times.at(-1) ?? null,
-      countries: [...new Set(rows.map((row) => row.country).filter(Boolean))],
-      publicIps: [...new Set(rows.map((row) => row.ip).filter(Boolean))],
+      countries: [...new Set(rows.map((row) => row.public_ip?.country).filter(Boolean))],
+      publicIps: [...new Set(rows.map((row) => row.public_ip?.ip).filter(Boolean))],
     };
   } catch (error) {
     console.error(`[shieldlabs] device history: ${error.message}`);

@@ -8,6 +8,7 @@
   </head>
   <body class="min-h-screen bg-slate-50 text-slate-900">
     <main class="mx-auto max-w-lg px-4 py-12">
+      <p class="mb-4 rounded border border-slate-200 bg-white p-3 text-sm">ShieldLabs tutorial: simulated actions only. Do not enter real passwords, payment details or personal information.</p>
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Demo Research</p>
       <h1 class="mt-1 text-2xl font-semibold">Kitchen habits survey</h1>
       <p class="mt-2 text-sm text-slate-600">Three questions, about two minutes. Get a $5 gift card for your answers.</p>
@@ -44,7 +45,7 @@
 
         <label class="block">
           <span class="text-sm font-medium">Email for your gift card</span>
-          <input id="email" name="email" type="email" autocomplete="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+          <input id="email" name="email" type="email" autocomplete="email" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" value="tutorial@example.test" />
         </label>
 
         <button
@@ -64,6 +65,7 @@
     </main>
 
     <script src="/config.js"></script>
+    <script src="/vendor/shieldlabs.js"></script>
     <script type="module" src="/index.js"></script>
   </body>
 </html>

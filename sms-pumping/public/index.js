@@ -14,6 +14,8 @@ phoneForm.addEventListener('submit', async (event) => {
     if (data.success) {
       // Stands in for the SMS arriving on the user's phone.
       document.getElementById('smsCode').textContent = data.demoCode;
+      // Demo-only code returned by our local simulator, not a real SMS secret.
+      codeForm.elements.code.value = data.demoCode;
       document.getElementById('smsBox').classList.remove('hidden');
       codeForm.classList.remove('hidden');
     }

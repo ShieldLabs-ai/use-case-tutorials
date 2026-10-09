@@ -16,7 +16,7 @@ The starter runs at http://127.0.0.1:3000 and needs no keys. The final needs a r
 
 ## Compare starter and final
 
-Stop the server before switching versions. From the repository root run `git diff starter final -- referral-fraud`, then switch branches and reinstall dependencies in this folder. Preserve your own uncommitted work in another clone rather than discarding it. Ignored .env files stay local; fill the final settings when moving from starter. Schema differences may recreate this app's disposable database.
+Stop the server before switching versions. From the repository root run `git diff starter origin/final -- referral-fraud`, then switch branches and reinstall dependencies in this folder. Preserve your own uncommitted work in another clone rather than discarding it. Ignored .env files stay local; fill the final settings when moving from starter. Schema differences may recreate this app's disposable database.
 
 In final, `public/shieldlabs.js` uses `@shieldlabs-ai/js@1.0.1` and sends a fresh action request ID. `server/shieldlabs.js` retrieves History with `@shieldlabs-ai/node@1.0.1`, rejects missing, stale, reused, limited and unusable results and applies the configured risk guard. It rereads after an 11-second observation delay as a demo precaution, not a server-guaranteed finality marker. The other modules in `server/` implement this app's rule and its own SQLite state. No sibling folder or root shared server is required.
 

@@ -15,14 +15,14 @@ test('the browser SDK returns request IDs and serializes simultaneous action che
   let active = 0, maximum = 0, count = 0;
   const mod = await browser({ identify: async () => {
     active++; maximum = Math.max(maximum, active); await new Promise(resolve => setTimeout(resolve, 2)); active--;
-    return { requestId: 'request-' + (++count) };
+    return { identificationId: 'request-' + (++count) };
   } });
   try { assert.deepEqual(await Promise.all([mod.identify(), mod.identify()]), ['request-1','request-2']); assert.equal(maximum, 1); }
   finally { mod.restore(); }
 });
 test('first focus shares its pending check with submit; another submit gets a fresh ID', async () => {
   let count = 0;
-  const mod = await browser({ identify: async () => ({ requestId: String(++count) }) });
+  const mod = await browser({ identify: async () => ({ identificationId: String(++count) }) });
   try {
     const form = new EventTarget(); const handle = mod.identifyOnFirstFocus(form);
     form.dispatchEvent(new Event('focusin'));
@@ -35,7 +35,7 @@ test('a failed agent returns no ID, never a made-up successful result', async ()
 });
 test('signed-in action uses its account HID without an extra background identification', async () => {
   const calls = [];
-  const mod = await browser({ identify: async options => { calls.push(options); return { requestId: 'id' }; } });
+  const mod = await browser({ identify: async options => { calls.push(options); return { identificationId: 'id' }; } });
   try {
     mod.checkSignedInUser('opaque-account'); assert.equal(calls.length, 0);
     const form = new EventTarget(); const handle = mod.identifyOnFirstFocus(form, { signedIn: true });
@@ -45,7 +45,7 @@ test('signed-in action uses its account HID without an extra background identifi
 
 test('unconfigured final does not call the scoring agent', async () => {
   let attempts=0;
-  const mod=await browser({identify:async()=>{attempts++;return{requestId:'should-not-run'};}});
+  const mod=await browser({identify:async()=>{attempts++;return{identificationId:'should-not-run'};}});
   try { window.SHIELDLABS_CONFIGURED=false; assert.equal(await mod.identify(),null); assert.equal(attempts,0); }
   finally { mod.restore(); }
 });

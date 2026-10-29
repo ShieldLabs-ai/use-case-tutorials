@@ -6,6 +6,7 @@ process.env.DEMO_DB_PATH = ':memory:';
 process.env.DEMO_ALLOW_RESET = '1';
 process.env.SHIELDLABS_PUBLIC_KEY = 'synthetic-public-key';
 process.env.SHIELDLABS_API_KEY = 'sec_abcd1234-efgh5678-ijkl9012';
+process.env.SHIELDLABS_DOMAIN_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 process.env.SHIELDLABS_API_URL = 'https://history.example.test';
 const DEVICE_A = '11111111-1111-4111-8111-111111111111';
 const DEVICE_B = '22222222-2222-4222-8222-222222222222';
@@ -19,28 +20,31 @@ let pausedFetch;
 let markStarted;
 globalThis.fetch = async (url, options) => {
   calls.push({ url: String(url), options });
-  assert.ok(String(url).startsWith('https://history.example.test/api/v1/history/'));
+  assert.ok(String(url).startsWith('https://history.example.test/api/v1/domains/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/history/'));
   assert.equal(new Headers(options.headers).get('authorization'), 'Bearer ' + process.env.SHIELDLABS_API_KEY);
   if (pausedFetch) { markStarted?.(); await pausedFetch; }
   const row = transform ? transform({ ...wire }, calls.length) : wire;
-  return Response.json({ data: [row], total: 1 }, { status: responseStatus });
+  return Response.json({ data: row }, { status: responseStatus });
 };
 const { app } = await import('../server/server.js');
 const { db } = await import('../server/db.js');
-const { verifyIdentification } = await import('../server/shieldlabs.js');
+const { verifyIdentification, getIdentification } = await import('../server/shieldlabs.js');
 
 function fixture(id, options = {}) {
+  const score = options.score ?? 15;
+  const now = new Date().toISOString();
   return {
-    request_id: id, device_id: options.device ?? DEVICE_A, visitor_id: DEVICE_A,
+    type: 'identification', id, domain_id: process.env.SHIELDLABS_DOMAIN_ID,
+    device_id: options.device ?? DEVICE_A, visitor_id: DEVICE_A,
     session_id: DEVICE_A, cookie_id: DEVICE_A, user_hid: options.userHid ?? 'anonymous',
-    domain: 'tutorial.example.test', site_domain: 'example.test', ip: '203.0.113.24',
-    country: options.country ?? 'US', score: options.score ?? 15,
+    domain: 'tutorial.example.test', public_ip: '203.0.113.24', country: options.country ?? 'US',
+    risk: { state: 'ok', score, band: score < 30 ? 'trusted' : score < 60 ? 'suspicious' : 'dangerous', as_of: now },
+    signals: { state: 'ok', items: [options.automation && 'browser_automation', options.vpn && 'vpn'].filter(Boolean) },
     created_at: new Date(Date.now() - (options.age ?? 60_000)).toISOString(),
-    score_details: '[{"Value":15,"Description":"Is VPN"}]',
-    is_browser_automation: options.automation ?? false, is_js_disabled: false,
-    is_vpn: options.vpn ?? false, connection_type: options.vpn ? 'vpn' : 'direct',
+    connection_type: options.vpn ? 'vpn' : 'direct',
   };
 }
+
 async function actAt(url, body = {}, options = {}, cookie) {
   const requestId = options.id ?? randomUUID();
   wire = fixture(requestId, options);
@@ -50,7 +54,7 @@ async function actAt(url, body = {}, options = {}, cookie) {
 const act = (fields = {}, options = {}, cookie) => actAt(route, { ...payload, ...fields }, options, cookie);
 
 test('a History row belonging to another request cannot authorize an action', async () => {
-  transform = row => ({ ...row, request_id: randomUUID() });
+  transform = row => ({ ...row, id: randomUUID() });
   assert.equal((await act()).body.success, false);
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM used_request_ids').get().n, 0);
 });
@@ -73,7 +77,7 @@ test('referral-fraud: serves its own page, public config and installed SDK', asy
   assert.match(bundle.body, /ShieldLabsJS/);
 });
 test('ordinary verified action is handled with the published Node SDK', async () => {
-  assert.equal((await act()).body.success, true); assert.equal(calls.length, 2);
+  assert.equal((await act()).body.success, true); assert.equal(calls.length, 1);
 });
 test('missing identification does not change protected state', async () => {
   const response = await app.inject({ method: 'POST', url: route, payload });
@@ -114,15 +118,15 @@ test('an unavailable History API never turns into a synthetic success', async ()
   assert.equal((await act()).body.success, false);
   assert.equal(calls.length, 1);
 });
-test('the delayed reread determines risk, not the early low score', async () => {
-  transform = (row, count) => ({ ...row, score: count === 1 ? 15 : 80 });
+test('pending risk is read again before authorizing an action', async () => {
+  transform = (row, count) => count === 1 ? { ...row, risk: { state: 'unavailable', band: null, as_of: null } } : { ...row, risk: { ...row.risk, score: 80, band: 'dangerous' } };
   const result = await act();
   assert.equal(result.body.success, false);
 
   assert.equal(calls.length, 2);
 });
 test('a future timestamp on the second read is also refused', async () => {
-  transform = (row, count) => count === 1 ? row : { ...row, created_at: new Date(Date.now() + 60_000).toISOString() };
+  transform = (row, count) => count === 1 ? { ...row, risk: { state: 'unavailable', band: null, as_of: null } } : { ...row, created_at: new Date(Date.now() + 60_000).toISOString() };
   assert.equal((await act()).body.success, false);
 });
 test('reset while History is pending cannot repopulate cleared verification state', async () => {
@@ -137,5 +141,23 @@ test('reset while History is pending cannot repopulate cleared verification stat
   const result = await pending;
   assert.equal(result.body.success, false);
   assert.match(result.body.message, /reset/);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM used_request_ids').get().n, 0);
+});
+
+for (const [name, mutate] of [
+  ['wrong domain', row => ({ ...row, domain_id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' })],
+  ['wrong entity type', row => ({ ...row, type: 'visitor' })],
+  ['missing signals', row => ({ ...row, signals: { state: 'ok' } })],
+  ['invalid score type', row => ({ ...row, risk: { ...row.risk, score: '15' } })],
+  ['Banned IP', row => ({ ...row, signals: { state: 'ok', items: ['banned_ip'] } })],
+]) test(name + ' cannot authorize an action or claim its ID', async () => {
+  transform = mutate;
+  assert.equal((await act()).body.success, false);
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM used_request_ids').get().n, 0);
+});
+for (const field of ['risk', 'signals']) test('unavailable ' + field + ' stays unverified within the read budget', async () => {
+  const id = randomUUID(); wire = fixture(id);
+  wire[field] = field === 'risk' ? { state: 'unavailable', band: null, as_of: null } : { state: 'unavailable', items: [] };
+  assert.equal(await getIdentification(id, { timeoutMs: 5 }), null);
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM used_request_ids').get().n, 0);
 });

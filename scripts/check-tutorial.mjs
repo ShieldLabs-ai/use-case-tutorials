@@ -51,7 +51,7 @@ export async function checkTutorial(name, repository = root) {
   const final = Boolean(manifest.dependencies['@shieldlabs-ai/node']);
   if (final) {
     for (const sdk of ['@shieldlabs-ai/js', '@shieldlabs-ai/node']) {
-      assert.equal(manifest.dependencies[sdk], '1.0.1', name + ': SDK must be pinned');
+      assert.equal(manifest.dependencies[sdk], sdk === '@shieldlabs-ai/js' ? '1.1.0' : '1.3.0', name + ': SDK must be pinned');
     }
     assert.ok((await exists(join(folder, 'public/shieldlabs.js')))?.isFile());
     assert.ok((await exists(join(folder, 'server/shieldlabs.js')))?.isFile());
@@ -72,6 +72,7 @@ export async function checkTutorial(name, repository = root) {
   if (final) {
     assert.equal(values.SHIELDLABS_PUBLIC_KEY, 'your-public-key');
     assert.equal(values.SHIELDLABS_API_KEY, 'sec_your_private_api_key');
+    assert.equal(values.SHIELDLABS_DOMAIN_ID, 'your-domain-uuid');
   }
   for (const sourceFolder of ['public', 'server', 'test']) {
     for (const file of await readdir(join(folder, sourceFolder))) {

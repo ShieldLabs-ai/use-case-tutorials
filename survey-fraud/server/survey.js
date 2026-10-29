@@ -19,7 +19,7 @@ export async function submitSurvey({ email, answers, requestId }) {
   if (!check.ok) {
     return { success: false, message: `Submission refused: ${check.message}` };
   }
-  const { device_id: deviceId, request_id: checkedRequestId } = check.identification;
+  const { device_id: deviceId, identification_id: checkedRequestId } = check.identification;
 
   // One paid submission per device: a new email address is not a new respondent.
   // The Device ID stays the same when cookies are cleared and in an incognito window.

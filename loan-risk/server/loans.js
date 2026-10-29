@@ -33,7 +33,7 @@ export async function applyForLoan({ firstName, lastName, monthlyIncome, amount,
   if (!check.ok) {
     return { success: false, message: `Application refused: ${check.message}` };
   }
-  const { device_id: deviceId, request_id: checkedRequestId } = check.identification;
+  const { device_id: deviceId, identification_id: checkedRequestId } = check.identification;
   const application = { firstName, lastName, monthlyIncome, amount, termMonths, deviceId, requestId: checkedRequestId };
 
   // Compare with the applications from the same device in the last 24 hours. A

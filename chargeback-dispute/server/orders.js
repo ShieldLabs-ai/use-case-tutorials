@@ -1,6 +1,6 @@
 import { db } from './db.js';
 import { findEvent } from './events.js';
-import { band, readHistory, verifyIdentification } from './shieldlabs.js';
+import { band, readDevice, verifyIdentification } from './shieldlabs.js';
 
 // Places a ticket order. The payment is simulated and always approved.
 export async function placeOrder({ eventId, quantity, email, cardNumber, requestId }) {
@@ -47,7 +47,7 @@ export async function placeOrder({ eventId, quantity, email, cardNumber, request
       publicIp.ip,
       publicIp.country,
       riskScore,
-      check.identification.request_id,
+      check.identification.identification_id,
       Date.now(),
     );
 
@@ -111,20 +111,19 @@ function findOrder(id) {
   return db.prepare('SELECT * FROM orders WHERE id = ?').get(Number(id));
 }
 
-// The device's history in ShieldLabs: its newest 100 identifications on your site.
+// Read the device card directly; no retired per-device identification search.
 async function summarizeDevice(deviceId) {
   try {
-    const rows = await readHistory('device_id', deviceId, 100);
-    const times = rows.map((row) => row.observed_at).sort();
+    const card = await readDevice(deviceId);
     return {
-      identifications: rows.length,
-      firstSeen: times[0] ?? null,
-      lastSeen: times.at(-1) ?? null,
-      countries: [...new Set(rows.map((row) => row.public_ip?.country).filter(Boolean))],
-      publicIps: [...new Set(rows.map((row) => row.public_ip?.ip).filter(Boolean))],
+      identifications: card.identifications ?? null,
+      firstSeen: card.first_seen ?? null,
+      lastSeen: card.last_seen ?? null,
+      risk: card.risk,
+      card,
     };
   } catch (error) {
-    console.error(`[shieldlabs] device history: ${error.message}`);
-    return { error: 'The History API could not be read.' };
+    console.warn('[shieldlabs] Device card unavailable:', error.name);
+    return { error: 'The device card could not be read.' };
   }
 }

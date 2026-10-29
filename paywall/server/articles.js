@@ -24,7 +24,7 @@ export async function readArticle({ articleId, requestId }) {
   if (!check.ok) {
     return { success: false, message: `Article locked: ${check.message}` };
   }
-  const { device_id: deviceId, request_id: checkedRequestId } = check.identification;
+  const { device_id: deviceId, identification_id: checkedRequestId } = check.identification;
 
   const readToday = articlesReadSince(deviceId, Date.now() - DAY);
   const alreadyRead = readToday.includes(article.id);

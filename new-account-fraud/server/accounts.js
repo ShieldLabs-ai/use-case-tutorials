@@ -16,7 +16,7 @@ export async function signUp({ username, password, requestId }) {
   if (!check.ok) {
     return { success: false, message: `Signup refused: ${check.message}` };
   }
-  const { device_id: deviceId, request_id: checkedRequestId } = check.identification;
+  const { device_id: deviceId, identification_id: checkedRequestId } = check.identification;
 
   if (findAccount(username)) {
     return { success: false, message: 'That username is taken.' };

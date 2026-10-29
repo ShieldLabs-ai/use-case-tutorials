@@ -23,7 +23,7 @@ export async function applyCoupon({ code, requestId }) {
   if (!check.ok) {
     return { success: false, message: `Coupon refused: ${check.message}` };
   }
-  const { device_id: deviceId, request_id: checkedRequestId } = check.identification;
+  const { device_id: deviceId, identification_id: checkedRequestId } = check.identification;
 
   const coupon = findCoupon(code);
   if (!coupon) {

@@ -55,7 +55,7 @@ export async function activateRegionalPrice({ country, requestId }) {
 
   db.prepare(
     'INSERT INTO price_activations (country, percent_off, device_id, request_id, created_at) VALUES (?, ?, ?, ?, ?)',
-  ).run(selected.code, selected.percentOff, check.identification.device_id, check.identification.request_id, Date.now());
+  ).run(selected.code, selected.percentOff, check.identification.device_id, check.identification.identification_id, Date.now());
 
   return {
     success: true,

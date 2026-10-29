@@ -21,7 +21,7 @@ export async function sendCode({ phone, requestId }) {
   if (!check.ok) {
     return { success: false, message: `No code sent: ${check.message}` };
   }
-  const { device_id: deviceId, request_id: checkedRequestId, detection_flags: flags } = check.identification;
+  const { device_id: deviceId, identification_id: checkedRequestId, detection_flags: flags } = check.identification;
   if (flags.tor) {
     return { success: false, message: 'No code sent: codes cannot be requested over Tor.' };
   }

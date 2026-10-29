@@ -89,11 +89,11 @@ function section(title, lines) {
 
 function describeHistory(history) {
   if (history.error) return [history.error];
-  if (history.identifications === 0) return ['No identifications of this device in the History API.'];
   return [
-    `${history.identifications} identifications between ${history.firstSeen.slice(0, 16)} and ${history.lastSeen.slice(0, 16)} UTC`,
-    `Countries: ${history.countries.join(', ')}`,
-    `Public IPs: ${history.publicIps.join(', ')}`,
+    `Identifications: ${history.identifications ?? 'Unavailable'}`,
+    `First seen: ${history.firstSeen?.slice(0, 16) ?? 'Unavailable'}`,
+    `Last seen: ${history.lastSeen?.slice(0, 16) ?? 'Unavailable'}`,
+    `Current device risk: ${history.risk?.state === 'ok' ? history.risk.band : 'Unavailable'}`,
   ];
 }
 

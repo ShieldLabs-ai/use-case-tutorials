@@ -38,7 +38,7 @@ export async function searchFlights({ from, to, date, requestId }) {
 
   db.prepare(
     'INSERT INTO searches (origin, destination, date, device_id, request_id, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-  ).run(origin.code, destination.code, date, check.identification.device_id, check.identification.request_id, Date.now());
+  ).run(origin.code, destination.code, date, check.identification.device_id, check.identification.identification_id, Date.now());
 
   const flights = buildSchedule(origin.code, destination.code, date);
   return {

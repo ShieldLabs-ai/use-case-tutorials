@@ -39,7 +39,7 @@ export async function checkout({ email, requestId }, reply) {
   if (!check.ok) {
     return { success: false, message: `Order refused: ${check.message}` };
   }
-  const { device_id: deviceId, request_id: checkedRequestId } = check.identification;
+  const { device_id: deviceId, identification_id: checkedRequestId } = check.identification;
 
   // One first-order discount per Device ID, no matter how many emails or
   // cleared-cookie sessions try to claim it again.

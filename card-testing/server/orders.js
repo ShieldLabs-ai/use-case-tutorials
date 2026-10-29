@@ -26,7 +26,7 @@ export async function purchaseGiftCard({ recipientEmail, amount, cardNumber, exp
   if (!check.ok) {
     return { success: false, message: `Payment refused: ${check.message}` };
   }
-  const { device_id: deviceId, request_id: checkedRequestId } = check.identification;
+  const { device_id: deviceId, identification_id: checkedRequestId } = check.identification;
 
   // Card testing is many declined cards from one device. Cap the declines per
   // Device ID, which stays the same across cleared cookies, incognito windows and

@@ -5,7 +5,7 @@ if (window.SHIELDLABS_CONFIGURED === false) {
   notice.id = 'shieldlabs-setup-notice';
   notice.setAttribute('role', 'note');
   notice.style.cssText = 'padding:12px;margin:12px;border:1px solid #cc8c00;background:#fff6d8;color:#402d00';
-  notice.textContent = 'Final integration is not configured. Add this domain’s Public Key and Private API Key to your private .env, restart the server, then reload. Follow this app’s README. Never put the Private API Key in browser code.';
+  notice.textContent = 'Final integration is not configured. Add this domain’s Public Key, Private API Key and domain UUID to your private .env, restart the server, then reload. Follow this app’s README. Never put the Private API Key in browser code.';
   document.querySelector('main')?.prepend(notice);
 }
 let agentPromise;
@@ -25,7 +25,7 @@ export function identify(userId) {
   const task = queue.then(async () => {
     const loaded = await agent();
     const result = await loaded.identify(userId ? { userId } : undefined);
-    return result.requestId;
+    return result.identificationId;
   }).catch(() => null); // null means unverified; the server must refuse it.
   queue = task.then(() => undefined);
   return task;
